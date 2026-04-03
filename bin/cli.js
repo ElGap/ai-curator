@@ -586,18 +586,18 @@ async function handleImport(args) {
 
       try {
         // Security: Validate file path to prevent path traversal
-        filePath = validateFilePath(filePath, dataDir);
+        const validatedPath = validateFilePath(filePath, dataDir);
 
         // Security: Validate file size (max 100MB for import)
-        const stats = validateFileSize(filePath, 100);
+        const stats = validateFileSize(validatedPath, 100);
         console.log(`📄 File size: ${(stats.size / 1024).toFixed(1)} KB`);
 
         // Read and parse the file
-        const fileContent = fs.readFileSync(filePath, "utf-8");
+        const fileContent = fs.readFileSync(validatedPath, "utf-8");
         let records = [];
 
         // Parse JSON or JSONL
-        if (filePath.endsWith(".jsonl") || fileContent.trim().startsWith("{")) {
+        if (validatedPath.endsWith(".jsonl") || fileContent.trim().startsWith("{")) {
           // Try JSONL first
           const lines = fileContent.split("\n").filter((line) => line.trim());
           for (const line of lines) {

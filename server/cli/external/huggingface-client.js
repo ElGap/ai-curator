@@ -1,6 +1,8 @@
 // server/cli/external/huggingface-client.js
 // Hugging Face Hub client for dataset discovery and download
 
+/* global AbortController */
+
 import { createWriteStream, existsSync, mkdirSync } from "fs";
 import { join } from "path";
 

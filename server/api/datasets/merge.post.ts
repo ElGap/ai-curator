@@ -120,7 +120,7 @@ export default defineEventHandler(async (event) => {
 
     const insertedSamples = await Promise.all(
       sourceSamples.map(async (sample) => {
-        const { id, createdAt, updatedAt, ...sampleData } = sample;
+        const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...sampleData } = sample;
         return db
           .insert(samples)
           .values({
