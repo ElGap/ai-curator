@@ -1,7 +1,7 @@
 # AI Curator
 
-> **Local-first dataset preparation layer ofr LLM fine-tuning**  
-> _No Code Required. Zero config. Full ownership. MIT licensed._
+> **Local-first dataset preparation layer for LLM fine-tuning**  
+> _No Code. Zero config. Full ownership. MIT licensed._
 
 [![npm version](https://badge.fury.io/js/@elgap%2Fai-curator.svg)](https://badge.fury.io/js/@elgap/ai-curator)
 [![CI](https://github.com/elgap/ai-curator/actions/workflows/ci.yml/badge.svg)](https://github.com/elgap/ai-curator/actions/workflows/ci.yml)
@@ -253,4 +253,8 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-**Part of the EdukaAI project by Elgap** — making AI & fine-tuning accessible through open-source, no-code, zero config tools.
+****[AI Curator](https://github.com/elgap/ai-curator)** and **[EdukaAi Studio](https://github.com/elgap/edukaai-studio)** are part of EdukaAI project by Elgap** — making AI & fine-tuning accessible through open-source, no-code, zero config tools.
+
+  
+
+ 
