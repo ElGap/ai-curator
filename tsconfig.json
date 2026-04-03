@@ -1,0 +1,86 @@
+{
+  "compilerOptions": {
+    // Target & Module
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+
+    // Strict Type Checking
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": false,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": false,
+
+    // Module Resolution
+    "baseUrl": ".",
+    "paths": {
+      "~": ["./app"],
+      "~/*": ["./app/*"],
+      "@": ["./app"],
+      "@/*": ["./app/*"],
+      "~~": ["."],
+      "~~/*": ["./*"],
+      "@@": ["."],
+      "@@/*": ["./*"],
+      "#app": ["./node_modules/nuxt/dist/app"],
+      "#app/*": ["./node_modules/nuxt/dist/app/*"],
+      "#server": ["./server"],
+      "#server/*": ["./server/*"],
+      "#ui": ["./node_modules/@nuxt/ui/dist/runtime"],
+      "#ui/*": ["./node_modules/@nuxt/ui/dist/runtime/*"]
+    },
+
+    // Emit
+    "noEmit": true,
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+
+    // Interop & Compatibility
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    // JSX
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+
+    // Language Features
+    "useDefineForClassFields": true,
+    "allowArbitraryExtensions": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force"
+  },
+
+  "include": ["app/**/*", "server/**/*", "shared/**/*", "test/**/*", "bin/**/*", ".nuxt/nuxt.d.ts"],
+
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".output",
+    "data",
+    "**/*.spec.ts",
+    "**/*.test.ts.snap",
+    ".nuxt/dist",
+    ".nuxt/manifest",
+    ".nuxt/dev",
+    ".nuxt/types",
+    "*.backup",
+    "*.bak"
+  ]
+}

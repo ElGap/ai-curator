@@ -1,0 +1,114 @@
+{
+  "name": "@elgap/ai-curator",
+  "version": "0.3.0-beta",
+  "description": "AI Curator - Privacy-first dataset curation for LLM fine-tuning",
+  "author": "Ivan Pavkovic",
+  "license": "MIT",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "curator": "./bin/cli.js"
+  },
+  "main": "./bin/cli.js",
+  "files": [
+    ".output/",
+    "bin/",
+    "scripts/",
+    "README.md",
+    "LICENSE",
+    "MIGRATION_GUIDE.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "node scripts/migrate-data.js && nuxt prepare",
+    "prepublishOnly": "npm run build",
+    "db:generate": "drizzle-kit generate:sqlite",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:reset": "node bin/cli.js reset --force",
+    "lint": "eslint . --fix",
+    "format": "prettier --write .",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "prepare": "husky",
+    "clean": "rm -rf .output node_modules/.cache"
+  },
+  "keywords": [
+    "curator",
+    "dataset-curation",
+    "llm",
+    "fine-tuning",
+    "dataset",
+    "ai",
+    "machine-learning",
+    "training-data"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elgap/ai-curator.git"
+  },
+  "bugs": {
+    "url": "https://github.com/elgap/ai-curator/issues"
+  },
+  "homepage": "https://github.com/elgap/ai-curator#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@huggingface/hub": "^2.11.0",
+    "@nuxt/ui": "^4.5.1",
+    "@pinia/nuxt": "^0.11.3",
+    "@types/better-sqlite3": "^7.6.13",
+    "adm-zip": "^0.5.16",
+    "better-sqlite3": "^12.6.2",
+    "chart.js": "^4.4.9",
+    "drizzle-orm": "^0.45.1",
+    "kaggle-node": "^1.1.2",
+    "lucide-vue-next": "^0.577.0",
+    "pinia": "^3.0.4",
+    "vue": "^3.5.30",
+    "vue-chartjs": "^5.3.2",
+    "vue-router": "^4.5.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^2.0.3",
+    "@nuxt/devtools": "^3.2.3",
+    "@nuxt/eslint": "^1.2.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
+    "@vue/test-utils": "^2.4.6",
+    "drizzle-kit": "^0.31.9",
+    "eslint": "^9.21.0",
+    "eslint-plugin-vue": "^9.32.0",
+    "happy-dom": "^17.4.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "nuxt": "^4.3.1",
+    "prettier": "^3.5.3",
+    "typescript": "^5.9.3",
+    "vitest": "^3.0.7",
+    "vue-eslint-parser": "^9.4.3",
+    "vue-tsc": "^2.2.8"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.3",
+    "glob": "^13.0.6"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
+  }
+}
