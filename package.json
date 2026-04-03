@@ -13,10 +13,8 @@
   "files": [
     ".output/",
     "bin/",
-    "scripts/",
     "README.md",
-    "LICENSE",
-    "MIGRATION_GUIDE.md"
+    "LICENSE"
   ],
   "publishConfig": {
     "access": "public"
@@ -26,7 +24,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "node scripts/migrate-data.js && nuxt prepare",
+    "postinstall": "nuxt prepare",
     "prepublishOnly": "npm run build",
     "db:generate": "drizzle-kit generate:sqlite",
     "db:migrate": "drizzle-kit migrate",
