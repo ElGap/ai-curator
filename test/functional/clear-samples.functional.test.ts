@@ -43,7 +43,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
   it(
     "should show help text",
     () => {
-      const result = execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --help`, {
+      const result = execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --help`, {
         encoding: "utf-8",
         cwd: process.cwd(),
       });
@@ -68,7 +68,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
       fs.writeFileSync(testFile, JSON.stringify(testData, null, 2));
 
       // Import samples
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -80,10 +80,13 @@ describe("Clear Command - Functional Tests (CLI)", () => {
       // Try to clear without confirmation (should show warning and wait for input)
       // This would normally require stdin interaction
       // For test, we check that the help shows the warning
-      const helpResult = execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --help`, {
-        encoding: "utf-8",
-        cwd: process.cwd(),
-      });
+      const helpResult = execSync(
+        `npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --help`,
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+        }
+      );
 
       expect(helpResult).toContain("--force");
     },
@@ -104,7 +107,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
       fs.writeFileSync(testFile, JSON.stringify(testData, null, 2));
 
       // Import samples
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -114,7 +117,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
       });
 
       // Clear with force
-      const result = execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force`, {
+      const result = execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --force`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -138,7 +141,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
         JSON.stringify([{ instruction: "Test", output: "Output" }], null, 2)
       );
 
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -149,7 +152,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
 
       // Clear dataset 1 with force
       const result = execSync(
-        `node ${path.join(process.cwd(), "bin/cli.js")} clear --dataset 1 --force`,
+        `npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --dataset 1 --force`,
         {
           env: {
             ...process.env,
@@ -169,7 +172,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
     "should handle clearing empty dataset",
     () => {
       // Try to clear empty dataset
-      const result = execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force`, {
+      const result = execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --force`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -189,7 +192,7 @@ describe("Clear Command - Functional Tests (CLI)", () => {
     "should show error for non-existent dataset",
     () => {
       try {
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --dataset 999 --force`, {
+        execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --dataset 999 --force`, {
           env: {
             ...process.env,
             AI_CURATOR_SKIP_AUTO_IMPORT: "1",

@@ -107,7 +107,7 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
 
         // Step 1: Import via CLI
         // CLI uses DATABASE_URL and AI_CURATOR_DATA_DIR from test setup
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
+        execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
           env: {
             ...process.env,
             AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -117,14 +117,17 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
           cwd: process.cwd(),
         });
 
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         // Step 2: Get CLI imported samples using the shared database
         const db = getDb();
@@ -245,7 +248,7 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
         fs.writeFileSync(testFile, JSON.stringify(edgeCases, null, 2));
 
         // Import via CLI
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
+        execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
           env: {
             ...process.env,
             AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -254,14 +257,17 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
           cwd: process.cwd(),
         });
 
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         // Get CLI samples
         const db = getDb();
@@ -329,7 +335,7 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
         fs.writeFileSync(testFile, JSON.stringify([fullEdukaSample], null, 2));
 
         // Import via CLI
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
+        execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
           env: {
             ...process.env,
             AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -338,14 +344,17 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
           cwd: process.cwd(),
         });
 
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         // Verify all fields using Drizzle
         const db = getDb();
@@ -412,7 +421,7 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
 
         const startTime = Date.now();
 
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
+        execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
           env: {
             ...process.env,
             AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -421,14 +430,17 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
           cwd: process.cwd(),
         });
 
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         const duration = Date.now() - startTime;
 
@@ -457,7 +469,7 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
         const testFile = path.join(tempDir, "mixed-validity.json");
         fs.writeFileSync(testFile, JSON.stringify(mixedData, null, 2));
 
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
+        execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} reset --force`, {
           env: {
             ...process.env,
             AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -469,7 +481,7 @@ describe("E2E Import Tests - CLI vs UI Parity", () => {
         // CLI currently throws on invalid samples - wrap in try-catch
         try {
           execSync(
-            `node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+            `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
             {
               env: {
                 ...process.env,

@@ -47,7 +47,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-alpaca.json");
 
       const result = execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -67,7 +67,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-approved.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "status=approved" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "status=approved" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -86,7 +86,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-high-quality.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating>=4" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating>=4" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -99,7 +99,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-complex.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "status=approved AND quality_rating>=4" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "status=approved AND quality_rating>=4" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -114,7 +114,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test.jsonl");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format jsonl --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format jsonl --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -137,7 +137,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-mlx.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -154,7 +154,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-mlx-system.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --filter "status=approved" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --filter "status=approved" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -173,7 +173,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test.csv");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format csv --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format csv --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -197,7 +197,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-sharegpt.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format sharegpt --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format sharegpt --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -215,7 +215,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-unsloth.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format unsloth --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format unsloth --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -231,7 +231,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-trl.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format trl --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format trl --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -247,7 +247,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const baseOutput = join(outputDir, "split-test");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --split "0.6,0.2,0.2" --output ${baseOutput}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --split "0.6,0.2,0.2" --output ${baseOutput}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -276,7 +276,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-contains.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "instruction~goal" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "instruction~goal" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -289,7 +289,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-category.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "category=Basic_Facts" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "category=Basic_Facts" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 
@@ -306,7 +306,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-source.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "category=Basic_Facts" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "category=Basic_Facts" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd() }
       );
 

@@ -111,7 +111,7 @@ describe("Import Functional Tests", () => {
 
         // Import via CLI to dataset 2
         const result = execSync(
-          `node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
           {
             env: {
               ...process.env,
@@ -154,7 +154,7 @@ describe("Import Functional Tests", () => {
 
         // Import via CLI
         const result = execSync(
-          `node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
           {
             env: {
               ...process.env,
@@ -183,7 +183,7 @@ describe("Import Functional Tests", () => {
 
         // Import with dry-run flag
         const result = execSync(
-          `node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2 --dry-run`,
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2 --dry-run`,
           {
             env: {
               ...process.env,
@@ -211,14 +211,17 @@ describe("Import Functional Tests", () => {
         fs.writeFileSync(testFile, JSON.stringify(edukaaiSampleData, null, 2));
 
         // Import
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         // Verify dataset stats
         const db = getDb();
@@ -250,14 +253,17 @@ describe("Import Functional Tests", () => {
         fs.writeFileSync(testFile, JSON.stringify(testData, null, 2));
 
         // Import
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         // Verify field resolution - input takes precedence over question for instruction
         const db = getDb();
@@ -283,7 +289,7 @@ describe("Import Functional Tests", () => {
         // Import should report errors but not fail
         try {
           execSync(
-            `node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+            `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
             {
               env: {
                 ...process.env,
@@ -312,14 +318,17 @@ describe("Import Functional Tests", () => {
         fs.writeFileSync(testFile, JSON.stringify(edukaaiSampleData, null, 2));
 
         // Import
-        execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
-          env: {
-            ...process.env,
-            AI_CURATOR_SKIP_AUTO_IMPORT: "1",
-          },
-          encoding: "utf-8",
-          cwd: process.cwd(),
-        });
+        execSync(
+          `npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`,
+          {
+            env: {
+              ...process.env,
+              AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+            },
+            encoding: "utf-8",
+            cwd: process.cwd(),
+          }
+        );
 
         // Verify all fields preserved
         const db = getDb();

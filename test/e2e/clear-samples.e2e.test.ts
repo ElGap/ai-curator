@@ -52,7 +52,7 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       fs.writeFileSync(testFile, JSON.stringify(testData, null, 2));
 
       process.env.DATABASE_URL = testEnv.dbPath;
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -71,7 +71,7 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       expect(cliSamples).toHaveLength(20);
 
       // Clear via CLI with --force
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force --dataset 2`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --force --dataset 2`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -182,7 +182,7 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       fs.writeFileSync(testFile, JSON.stringify(edukaaiData, null, 2));
 
       process.env.DATABASE_URL = testEnv.dbPath;
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",
@@ -207,7 +207,7 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       expect(context1.tactical_concepts).toContain("step_overs");
 
       // Clear via CLI
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force --dataset 2`, {
+      execSync(`npx tsx ${path.join(process.cwd(), "bin/cli.js")} clear --force --dataset 2`, {
         env: {
           ...process.env,
           AI_CURATOR_SKIP_AUTO_IMPORT: "1",

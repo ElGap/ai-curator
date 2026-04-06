@@ -169,7 +169,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       // CLI already uses the same DATABASE_URL from test setup
       const result = execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -209,7 +209,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const outputFile = join(cliOutputDir, "starter-pack-mlx.jsonl");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -247,7 +247,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const outputFile = join(cliOutputDir, "starter-pack.jsonl");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format jsonl --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format jsonl --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -283,7 +283,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const outputFile = join(cliOutputDir, "starter-pack-high-quality.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating=5" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating=5" --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -310,7 +310,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const baseOutput = join(cliOutputDir, "starter-pack-split");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --split "0.8,0.1,0.1" --output ${baseOutput}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --split "0.8,0.1,0.1" --output ${baseOutput}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -360,7 +360,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
         try {
           execSync(
-            `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format ${format} --output ${outputFile}`,
+            `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format ${format} --output ${outputFile}`,
             { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
           );
 
@@ -416,7 +416,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const outputFile = join(cliOutputDir, "no-metadata-check.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -474,7 +474,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       try {
         execSync(
-          `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating>10" --output ${outputFile}`,
+          `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating>10" --output ${outputFile}`,
           { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
         );
 
@@ -506,7 +506,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const outputFile = join(cliOutputDir, "special-chars.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
@@ -545,7 +545,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       const outputFile = join(cliOutputDir, "long-instruction.json");
 
       execSync(
-        `node ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
         { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
       );
 
