@@ -484,7 +484,17 @@ export function getDb(): DatabaseClient {
     }
 
     const sqlite = new Database(dbPath);
-    sqlite.pragma("journal_mode = WAL");
+
+    // Only use WAL mode for production database, not for tests
+    // Tests use isolated temp databases that need DELETE mode for proper subprocess synchronization
+    const isTestDb =
+      dbPath.includes("/tmp/") ||
+      dbPath.includes("\\temp\\") ||
+      dbPath.includes("TEMPDIR") ||
+      dbPath.includes("tmpdir");
+    if (!isTestDb) {
+      sqlite.pragma("journal_mode = WAL");
+    }
 
     initDatabase(sqlite);
     db = drizzle(sqlite, { schema });
