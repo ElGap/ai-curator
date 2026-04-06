@@ -1,13 +1,9 @@
-import { describe, it, expect, beforeEach, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { ImportService } from "../../server/services/import/index.js";
 import { getDb, resetDb } from "../../server/db/index.js";
 import { samples as samplesTable, datasets } from "../../server/db/schema.js";
 import { eq } from "drizzle-orm";
-import {
-  createIsolatedTestEnvironment,
-  cleanupIsolatedTestEnvironment,
-  resetTestDatabase,
-} from "../test-env.js";
+import { createIsolatedTestEnvironment, cleanupIsolatedTestEnvironment } from "../test-env.js";
 
 /**
  * Unit and Functional Tests for Clear Samples Functionality
@@ -18,26 +14,20 @@ describe("Clear Samples - Unit & Functional Tests", () => {
   let testEnv: { tempDir: string; dataDir: string; dbPath: string };
   let importService: ImportService;
 
-  beforeAll(() => {
-    testEnv = createIsolatedTestEnvironment();
-  });
-
-  afterAll(() => {
-    cleanupIsolatedTestEnvironment(testEnv.tempDir);
-  });
-
   beforeEach(() => {
-    // Reset singleton before database operations
-    resetDb();
-
-    // Reset to clean state
-    resetTestDatabase(testEnv.dbPath);
-
-    // Reset singleton again to get fresh connection
-    resetDb();
+    // Create fresh isolated environment for each test
+    testEnv = createIsolatedTestEnvironment();
 
     // Create ImportService using the isolated database
     importService = new ImportService(testEnv.dbPath);
+  });
+
+  afterEach(() => {
+    // Clean up after each test
+    cleanupIsolatedTestEnvironment(testEnv.tempDir);
+
+    // Reset singleton to close connections
+    resetDb();
   });
 
   describe("ImportService.clearSamples()", () => {
@@ -171,17 +161,13 @@ describe("Clear Samples - Unit & Functional Tests", () => {
 describe("Clear Samples - API Endpoint Tests", () => {
   let testEnv: { tempDir: string; dataDir: string; dbPath: string };
 
-  beforeAll(() => {
-    testEnv = createIsolatedTestEnvironment();
-  });
-
-  afterAll(() => {
-    cleanupIsolatedTestEnvironment(testEnv.tempDir);
-  });
-
   beforeEach(() => {
+    testEnv = createIsolatedTestEnvironment();
     resetDb();
-    resetTestDatabase(testEnv.dbPath);
+  });
+
+  afterEach(() => {
+    cleanupIsolatedTestEnvironment(testEnv.tempDir);
     resetDb();
   });
 

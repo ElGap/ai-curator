@@ -57,7 +57,8 @@ export function cleanupIsolatedTestEnvironment(tempDir: string) {
  */
 export function resetTestDatabase(dbPath: string) {
   const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
+  // Use DELETE mode for reliable test isolation
+  db.pragma("journal_mode = DELETE");
   db.pragma("foreign_keys = OFF");
 
   // Get all tables
@@ -114,7 +115,9 @@ export function resetTestDatabase(dbPath: string) {
  */
 function seedTestDatabase(dbPath: string) {
   const db = new Database(dbPath);
-  db.pragma("journal_mode = WAL");
+  // Use DELETE mode instead of WAL for test isolation
+  // WAL mode can cause sync issues when subprocesses read before checkpoint
+  db.pragma("journal_mode = DELETE");
   db.pragma("foreign_keys = OFF");
 
   db.exec(`
