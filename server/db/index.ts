@@ -90,6 +90,8 @@ function initDatabase(sqlite: Database.Database) {
       default_quality TEXT DEFAULT 'medium',
       default_category TEXT DEFAULT 'general',
       default_auto_approve INTEGER DEFAULT 0,
+      goal_samples INTEGER DEFAULT 100,
+      goal_name TEXT DEFAULT 'First Fine-Tuning',
       sample_count INTEGER DEFAULT 0,
       approved_count INTEGER DEFAULT 0,
       last_import_at INTEGER,
@@ -98,8 +100,8 @@ function initDatabase(sqlite: Database.Database) {
     );
 
     -- Insert default dataset if none exists
-    INSERT OR IGNORE INTO datasets (id, name, description, is_active, default_quality, default_category)
-    VALUES (1, 'General', 'Default dataset for all examples', 1, 'medium', 'general');
+    INSERT OR IGNORE INTO datasets (id, name, description, is_active, default_quality, default_category, goal_samples, goal_name)
+    VALUES (1, 'General', 'Default dataset for training samples', 1, 'medium', 'general', 100, 'First Fine-Tuning');
 
     -- Create sources table for external integrations
     CREATE TABLE IF NOT EXISTS sources (
@@ -138,83 +140,75 @@ function initDatabase(sqlite: Database.Database) {
       default_dataset_name TEXT DEFAULT 'General',
       default_status TEXT DEFAULT 'draft',
       default_quality INTEGER DEFAULT 3,
+      is_enabled INTEGER DEFAULT 0,
       updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
     );
 
-    -- Seed default capture settings (General dataset as default)
-    INSERT OR IGNORE INTO capture_settings (id, default_dataset_id, default_dataset_name, default_status, default_quality)
-    VALUES (1, 1, 'General', 'draft', 3);
+    -- Seed default capture settings (General dataset as default, disabled by default)
+    INSERT OR IGNORE INTO capture_settings (id, default_dataset_id, default_dataset_name, default_status, default_quality, is_enabled)
+    VALUES (1, 1, 'General', 'draft', 3, 0);
+
+    -- Create user_settings table
+    CREATE TABLE IF NOT EXISTS user_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      default_goal_samples INTEGER DEFAULT 100,
+      default_auto_approve INTEGER DEFAULT 0,
+      theme TEXT DEFAULT 'system',
+      updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+    );
+
+    -- Seed default user settings
+    INSERT OR IGNORE INTO user_settings (id, default_goal_samples, default_auto_approve, theme)
+    VALUES (1, 100, 0, 'system');
+
+    -- Create analytics_snapshots table for historical tracking
+    CREATE TABLE IF NOT EXISTS analytics_snapshots (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      dataset_id INTEGER NOT NULL,
+      total_samples INTEGER DEFAULT 0,
+      approved_count INTEGER DEFAULT 0,
+      draft_count INTEGER DEFAULT 0,
+      review_count INTEGER DEFAULT 0,
+      rejected_count INTEGER DEFAULT 0,
+      avg_quality REAL DEFAULT 0,
+      median_quality REAL DEFAULT 0,
+      quality_std_dev REAL DEFAULT 0,
+      avg_instruction_length INTEGER DEFAULT 0,
+      avg_output_length INTEGER DEFAULT 0,
+      median_instruction_length INTEGER DEFAULT 0,
+      median_output_length INTEGER DEFAULT 0,
+      category_distribution TEXT DEFAULT '{}',
+      quality_distribution TEXT DEFAULT '{}',
+      difficulty_distribution TEXT DEFAULT '{}',
+      computed_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_analytics_snapshots_dataset_id ON analytics_snapshots(dataset_id);
+
+    -- Create export_logs table for tracking all exports
+    CREATE TABLE IF NOT EXISTS export_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      dataset_id INTEGER NOT NULL,
+      format TEXT NOT NULL,
+      sample_count INTEGER DEFAULT 0,
+      file_path TEXT,
+      file_size INTEGER DEFAULT 0,
+      filter_query TEXT,
+      split_ratios TEXT,
+      exported_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),
+      source TEXT DEFAULT 'cli'
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_export_logs_dataset_id ON export_logs(dataset_id);
+
+    -- Create indexes for samples table
+    CREATE INDEX IF NOT EXISTS idx_samples_dataset_id ON samples(dataset_id);
+    CREATE INDEX IF NOT EXISTS idx_samples_status ON samples(status);
+    CREATE INDEX IF NOT EXISTS idx_samples_category ON samples(category);
   `);
 
-  // Migration: Add goal_samples to datasets table
-  const datasetsTableInfo = sqlite.prepare("PRAGMA table_info(datasets)").all() as any[];
-  const hasGoalSamples = datasetsTableInfo.find((col) => col.name === "goal_samples");
-  const hasUserSettings =
-    (sqlite
-      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='user_settings'")
-      .get() as any) !== undefined;
-
-  if (!hasGoalSamples) {
-    console.log("Migrating: Adding goal_samples column to datasets table...");
-    sqlite.exec(`ALTER TABLE datasets ADD COLUMN goal_samples INTEGER DEFAULT NULL`);
-  }
-
-  if (!hasUserSettings) {
-    console.log("Creating user_settings table...");
-    sqlite.exec(`
-      CREATE TABLE IF NOT EXISTS user_settings (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        default_goal_samples INTEGER DEFAULT 100,
-        updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
-      );
-      
-      -- Insert default row
-      INSERT OR IGNORE INTO user_settings (id, default_goal_samples) VALUES (1, 100);
-    `);
-  }
-
-  // Migration: Remove DEFAULT constraint from datasets.updated_at if it exists
-  // SQLite doesn't support ALTER COLUMN, so we need to recreate the table
-  const tableInfo = sqlite.prepare("PRAGMA table_info(datasets)").all() as any[];
-  const updatedAtColumn = tableInfo.find((col) => col.name === "updated_at");
-
-  if (updatedAtColumn && updatedAtColumn.dflt_value !== null) {
-    console.log("Migrating datasets table to remove updated_at DEFAULT constraint...");
-
-    sqlite.exec(`
-      -- Create new table without DEFAULT
-      CREATE TABLE datasets_new (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        description TEXT,
-        is_active INTEGER DEFAULT 0,
-        is_archived INTEGER DEFAULT 0,
-        default_quality TEXT DEFAULT 'medium',
-        default_category TEXT DEFAULT 'general',
-        default_auto_approve INTEGER DEFAULT 0,
-        sample_count INTEGER DEFAULT 0,
-        approved_count INTEGER DEFAULT 0,
-        last_import_at INTEGER,
-        created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),
-        updated_at INTEGER
-      );
-      
-      -- Copy data
-      INSERT INTO datasets_new 
-        SELECT id, name, description, is_active, is_archived, default_quality, 
-               default_category, default_auto_approve, sample_count, approved_count, 
-               last_import_at, created_at, updated_at 
-        FROM datasets;
-      
-      -- Drop old table
-      DROP TABLE datasets;
-      
-      -- Rename new table
-      ALTER TABLE datasets_new RENAME TO datasets;
-    `);
-
-    console.log("Migration complete.");
-  }
+  // Clean slate: No migrations needed for fresh install
+  // All tables are created with correct schema from the start
 
   initialized = true;
 }

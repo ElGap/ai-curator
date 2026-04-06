@@ -32,8 +32,13 @@ if (!process.env.AI_CURATOR_PORT) {
   process.env.AI_CURATOR_PORT = DEFAULT_PORT;
 }
 
-const dataDir = process.env.AI_CURATOR_DATA_DIR || path.join(os.homedir(), ".curator");
-const dbPath = process.env.DATABASE_URL || path.join(dataDir, "curator.db");
+// Unified database path resolution (must match server/db/index.ts)
+const dataDir = process.env.AI_CURATOR_DATA_DIR
+  ? path.resolve(process.env.AI_CURATOR_DATA_DIR)
+  : path.resolve("./data");
+const dbPath = process.env.DATABASE_URL
+  ? path.resolve(process.env.DATABASE_URL)
+  : path.join(dataDir, "curator.db");
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -1336,146 +1341,257 @@ async function handleReset(args) {
     const { default: Database } = await import("better-sqlite3");
     const db = new Database(dbPath);
 
-    // Check if tables exist
-    const tablesResult = db
-      .prepare(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('samples', 'datasets', 'user_settings')"
-      )
-      .all();
-    const existingTables = tablesResult.map((t) => t.name);
-
-    // If no tables exist, create schema from migration
-    if (existingTables.length === 0) {
-      console.log("📭 Database is empty. Creating schema from migration...\n");
-
-      // Read and apply the migration SQL
-      const migrationPath = path.join(
-        packageRoot,
-        "server/db/migrations/0000_glorious_betty_brant.sql"
+    // Clean slate: Create complete schema if tables don't exist
+    db.exec(`
+      -- Core tables
+      CREATE TABLE IF NOT EXISTS samples (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dataset_id INTEGER,
+        dataset_name TEXT,
+        instruction TEXT NOT NULL,
+        input TEXT,
+        output TEXT NOT NULL,
+        system_prompt TEXT,
+        category TEXT DEFAULT 'general',
+        difficulty TEXT DEFAULT 'intermediate',
+        quality_rating INTEGER DEFAULT 3,
+        notes TEXT,
+        tags TEXT,
+        source TEXT DEFAULT 'manual',
+        model TEXT,
+        session_id TEXT,
+        message_id TEXT,
+        tokens_in INTEGER,
+        tokens_out INTEGER,
+        cost REAL,
+        tools_used TEXT,
+        temperature REAL,
+        top_p REAL,
+        top_k INTEGER,
+        max_tokens INTEGER,
+        frequency_penalty REAL,
+        presence_penalty REAL,
+        stop_sequences TEXT,
+        seed INTEGER,
+        context TEXT,
+        metadata TEXT,
+        status TEXT DEFAULT 'draft',
+        created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),
+        updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
       );
-      if (fs.existsSync(migrationPath)) {
-        const migrationSql = fs.readFileSync(migrationPath, "utf-8");
-        // Split by statement-breakpoint and execute each statement
-        const statements = migrationSql
-          .split("--> statement-breakpoint")
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0);
 
-        for (const statement of statements) {
-          try {
-            db.prepare(statement).run();
-          } catch (e) {
-            // Ignore errors for existing tables or indexes
-            if (!e.message.includes("already exists")) {
-              console.log(`   ⚠️ Migration step skipped: ${e.message}`);
-            }
-          }
-        }
-        console.log("   ✓ Schema created\n");
-      } else {
-        console.log("⚠️  Migration file not found. Please ensure migrations are generated.");
-        console.log("   Run: npm run db:generate");
-        process.exit(1);
-      }
-    }
+      CREATE TABLE IF NOT EXISTS datasets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT,
+        is_active INTEGER DEFAULT 0,
+        is_archived INTEGER DEFAULT 0,
+        default_quality TEXT DEFAULT 'medium',
+        default_category TEXT DEFAULT 'general',
+        default_auto_approve INTEGER DEFAULT 0,
+        goal_samples INTEGER DEFAULT 100,
+        goal_name TEXT DEFAULT 'First Fine-Tuning',
+        sample_count INTEGER DEFAULT 0,
+        approved_count INTEGER DEFAULT 0,
+        last_import_at INTEGER,
+        created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),
+        updated_at INTEGER
+      );
 
-    // Check if goal_name column exists (for older databases)
-    const columnsResult = db.prepare("PRAGMA table_info(datasets)").all();
-    const hasGoalName = columnsResult.some((col) => col.name === "goal_name");
+      CREATE TABLE IF NOT EXISTS sources (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        description TEXT,
+        icon TEXT,
+        color TEXT,
+        website TEXT,
+        documentation TEXT,
+        supports_sessions INTEGER DEFAULT 0,
+        supports_realtime INTEGER DEFAULT 0,
+        supports_batching INTEGER DEFAULT 1,
+        supports_context INTEGER DEFAULT 0,
+        is_enabled INTEGER DEFAULT 1,
+        is_official INTEGER DEFAULT 0,
+        total_captures INTEGER DEFAULT 0,
+        last_capture_at INTEGER,
+        created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),
+        updated_at INTEGER
+      );
 
-    // Add goal_name column if missing (schema migration for existing tables)
-    if (existingTables.includes("datasets") && !hasGoalName) {
-      console.log("📦 Updating database schema...");
-      try {
-        db.prepare(
-          "ALTER TABLE datasets ADD COLUMN goal_name text DEFAULT 'First Fine-Tuning'"
-        ).run();
-        console.log("   ✓ Added goal_name column\n");
-      } catch (_e) {
-        console.log("   ⚠️ Could not add goal_name column (may already exist)\n");
-      }
-    }
+      CREATE TABLE IF NOT EXISTS import_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        source TEXT NOT NULL,
+        file_path TEXT,
+        date_from INTEGER,
+        date_to INTEGER,
+        total_entries INTEGER DEFAULT 0,
+        imported_count INTEGER DEFAULT 0,
+        skipped_count INTEGER DEFAULT 0,
+        created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+      );
 
-    // Get counts before deletion
-    let sampleCount = 0;
-    let datasetCount = 0;
+      CREATE TABLE IF NOT EXISTS milestones (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT,
+        target_count INTEGER NOT NULL,
+        achieved_at INTEGER,
+        created_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+      );
 
-    if (existingTables.includes("samples")) {
-      const sampleCountResult = db.prepare("SELECT COUNT(*) as count FROM samples").get();
-      sampleCount = sampleCountResult ? sampleCountResult.count : 0;
-    }
+      CREATE TABLE IF NOT EXISTS settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        key TEXT UNIQUE NOT NULL,
+        value TEXT,
+        updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+      );
 
-    if (existingTables.includes("datasets")) {
-      const datasetCountResult = db.prepare("SELECT COUNT(*) as count FROM datasets").get();
-      datasetCount = datasetCountResult ? datasetCountResult.count : 0;
-    }
+      CREATE TABLE IF NOT EXISTS user_settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        default_goal_samples INTEGER DEFAULT 100,
+        default_auto_approve INTEGER DEFAULT 0,
+        theme TEXT DEFAULT 'system',
+        updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+      );
+
+      CREATE TABLE IF NOT EXISTS capture_settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        default_dataset_id INTEGER DEFAULT 1,
+        default_dataset_name TEXT DEFAULT 'General',
+        default_status TEXT DEFAULT 'draft',
+        default_quality INTEGER DEFAULT 3,
+        is_enabled INTEGER DEFAULT 0,
+        updated_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+      );
+
+      CREATE TABLE IF NOT EXISTS analytics_snapshots (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dataset_id INTEGER NOT NULL,
+        total_samples INTEGER DEFAULT 0,
+        approved_count INTEGER DEFAULT 0,
+        draft_count INTEGER DEFAULT 0,
+        review_count INTEGER DEFAULT 0,
+        rejected_count INTEGER DEFAULT 0,
+        avg_quality REAL DEFAULT 0,
+        median_quality REAL DEFAULT 0,
+        quality_std_dev REAL DEFAULT 0,
+        avg_instruction_length INTEGER DEFAULT 0,
+        avg_output_length INTEGER DEFAULT 0,
+        median_instruction_length INTEGER DEFAULT 0,
+        median_output_length INTEGER DEFAULT 0,
+        category_distribution TEXT DEFAULT '{}',
+        quality_distribution TEXT DEFAULT '{}',
+        difficulty_distribution TEXT DEFAULT '{}',
+        computed_at INTEGER DEFAULT (strftime('%s', 'now') * 1000)
+      );
+
+      CREATE TABLE IF NOT EXISTS export_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        dataset_id INTEGER NOT NULL,
+        format TEXT NOT NULL,
+        sample_count INTEGER DEFAULT 0,
+        file_path TEXT,
+        file_size INTEGER DEFAULT 0,
+        filter_query TEXT,
+        split_ratios TEXT,
+        exported_at INTEGER DEFAULT (strftime('%s', 'now') * 1000),
+        source TEXT DEFAULT 'cli'
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_samples_dataset_id ON samples(dataset_id);
+      CREATE INDEX IF NOT EXISTS idx_samples_status ON samples(status);
+      CREATE INDEX IF NOT EXISTS idx_samples_category ON samples(category);
+      CREATE INDEX IF NOT EXISTS idx_analytics_snapshots_dataset_id ON analytics_snapshots(dataset_id);
+      CREATE INDEX IF NOT EXISTS idx_export_logs_dataset_id ON export_logs(dataset_id);
+    `);
+
+    // Get current counts before clearing
+    const sampleCountResult = db.prepare("SELECT COUNT(*) as count FROM samples").get();
+    const datasetCountResult = db.prepare("SELECT COUNT(*) as count FROM datasets").get();
+    const sampleCount = sampleCountResult ? sampleCountResult.count : 0;
+    const datasetCount = datasetCountResult ? datasetCountResult.count : 0;
 
     console.log(`📊 Current state:`);
     console.log(`   Samples: ${sampleCount}`);
     console.log(`   Datasets: ${datasetCount}\n`);
 
-    // Delete all samples
-    let deletedSamples = 0;
-    if (existingTables.includes("samples")) {
-      const deleteSamples = db.prepare("DELETE FROM samples");
-      deletedSamples = deleteSamples.run().changes;
+    // Clear all data from tables (but keep the tables)
+    db.prepare("DELETE FROM samples").run();
+    db.prepare("DELETE FROM datasets").run();
+    db.prepare("DELETE FROM import_sessions").run();
+    db.prepare("DELETE FROM milestones").run();
+    db.prepare("DELETE FROM settings").run();
+    db.prepare("DELETE FROM export_logs").run();
+    db.prepare("DELETE FROM analytics_snapshots").run();
+
+    // Reset auto-increment sequences
+    try {
+      db.prepare(
+        "DELETE FROM sqlite_sequence WHERE name IN ('samples', 'datasets', 'import_sessions', 'milestones', 'settings')"
+      ).run();
+    } catch (_e) {
+      // sqlite_sequence might not have entries yet
     }
 
-    // Delete all datasets
-    let deletedDatasets = 0;
-    if (existingTables.includes("datasets")) {
-      const deleteDatasets = db.prepare("DELETE FROM datasets");
-      deletedDatasets = deleteDatasets.run().changes;
+    // Insert seed data
 
-      // Reset auto-increment counter so IDs start from 1
-      try {
-        db.prepare("DELETE FROM sqlite_sequence WHERE name='datasets'").run();
-      } catch (_e) {
-        // sqlite_sequence might not exist or table wasn't using auto-increment
-      }
-    }
-
-    // Create default dataset with correct schema (now with goal_name for sure)
-    const insertSql = `
+    // Default dataset
+    const insertDatasetSql = `
       INSERT INTO datasets (
-        name, description, is_active, is_archived, default_quality, default_category, 
+        id, name, description, is_active, is_archived, default_quality, default_category, 
         default_auto_approve, goal_samples, goal_name, sample_count, approved_count,
         created_at, updated_at
       )
       VALUES (
-        'General', 'Default dataset for training samples', 1, 0, 'medium', 'general', 
+        1, 'General', 'Default dataset for training samples', 1, 0, 'medium', 'general', 
         0, 100, 'First Fine-Tuning', 0, 0,
         (strftime('%s', 'now') * 1000),
         (strftime('%s', 'now') * 1000)
       )
     `;
+    db.prepare(insertDatasetSql).run();
 
-    const defaultDatasetResult = db.prepare(insertSql).run();
+    // Default sources
+    db.prepare(
+      `
+      INSERT OR REPLACE INTO sources (key, name, description, icon, color, is_official, is_enabled, supports_batching, supports_context)
+      VALUES 
+        ('manual', 'Manual (Web UI)', 'Samples created manually through the web interface', 'mouse-pointer', '#6b7280', 1, 1, 0, 0),
+        ('json', 'JSON Import', 'Samples imported from JSON files', 'file-json', '#3b82f6', 1, 1, 1, 0),
+        ('csv', 'CSV Import', 'Samples imported from CSV files', 'table', '#22c55e', 1, 1, 1, 0),
+        ('opencode', 'OpenCode', 'Live capture from OpenCode CLI conversations', 'terminal', '#8b5cf6', 1, 1, 1, 1)
+    `
+    ).run();
 
-    // Reset user settings to defaults (if table exists)
-    if (existingTables.includes("user_settings")) {
-      try {
-        db.prepare(
-          `
-          INSERT OR REPLACE INTO user_settings (id, default_goal_samples, default_auto_approve, theme)
-          VALUES (1, 100, 0, 'system')
-        `
-        ).run();
-      } catch (_e) {
-        // Table might have different schema, that's ok
-      }
-    }
+    // Capture settings - DISABLED by default
+    db.prepare(
+      `
+      INSERT OR REPLACE INTO capture_settings (id, default_dataset_id, default_dataset_name, default_status, default_quality, is_enabled)
+      VALUES (1, 1, 'General', 'draft', 3, 0)
+    `
+    ).run();
+
+    // User settings
+    db.prepare(
+      `
+      INSERT OR REPLACE INTO user_settings (id, default_goal_samples, default_auto_approve, theme)
+      VALUES (1, 100, 0, 'system')
+    `
+    ).run();
 
     db.close();
 
     console.log("✅ Database reset complete!");
-    console.log(`   Deleted ${deletedSamples} samples`);
-    console.log(`   Deleted ${deletedDatasets} datasets`);
-    console.log(`   Created new 'General' dataset (ID: ${defaultDatasetResult.lastInsertRowid})`);
+    console.log(`   Deleted ${sampleCount} samples`);
+    console.log(`   Deleted ${datasetCount} datasets`);
+    console.log(`   Created new 'General' dataset (ID: 1)`);
     console.log(`   Goal: First Fine-Tuning (100 samples)`);
-    console.log(`   Dataset set as active\n`);
+    console.log(`   Dataset set as active`);
+    console.log(`   Live capture: DISABLED by default\n`);
 
     console.log("💡 Tip: Start the server with 'curator' to begin fresh.");
+    console.log("   Enable live capture in Settings when ready to receive data.");
   } catch (error) {
     console.error(`\n❌ Error resetting database: ${error.message}`);
     console.error(error.stack);
