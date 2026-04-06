@@ -53,7 +53,7 @@ export async function clearCommand(options: ClearOptions): Promise<{
     const importService = new ImportService(dbPath);
 
     // Get dataset info first
-    const { getDb } = await import("../db/index.js");
+    const { getDb } = await import("../db/index.ts");
     const db = getDb();
 
     // If no dataset ID provided, use active dataset
@@ -63,7 +63,7 @@ export async function clearCommand(options: ClearOptions): Promise<{
 
     if (!targetDatasetId) {
       // Get active dataset
-      const { datasets } = await import("../db/schema.js");
+      const { datasets } = await import("../db/schema.ts");
       const { eq } = await import("drizzle-orm");
 
       const activeDataset = await db.query.datasets.findFirst({
@@ -82,7 +82,7 @@ export async function clearCommand(options: ClearOptions): Promise<{
       sampleCount = activeDataset.sampleCount || 0;
     } else {
       // Get specified dataset
-      const { datasets } = await import("../db/schema.js");
+      const { datasets } = await import("../db/schema.ts");
       const { eq } = await import("drizzle-orm");
 
       const dataset = await db.query.datasets.findFirst({

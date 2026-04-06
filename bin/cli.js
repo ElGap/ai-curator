@@ -1509,6 +1509,9 @@ async function handleReset(args) {
     console.log(`   Samples: ${sampleCount}`);
     console.log(`   Datasets: ${datasetCount}\n`);
 
+    // Disable foreign keys temporarily to allow clearing tables with FK relationships
+    db.pragma("foreign_keys = OFF");
+
     // Clear all data from tables (but keep the tables)
     db.prepare("DELETE FROM samples").run();
     db.prepare("DELETE FROM datasets").run();
@@ -1517,6 +1520,9 @@ async function handleReset(args) {
     db.prepare("DELETE FROM settings").run();
     db.prepare("DELETE FROM export_logs").run();
     db.prepare("DELETE FROM analytics_snapshots").run();
+
+    // Re-enable foreign keys
+    db.pragma("foreign_keys = ON");
 
     // Reset auto-increment sequences
     try {
@@ -1592,66 +1598,69 @@ async function handleReset(args) {
     ).run();
 
     // First-run auto-import: Load EdukaAI Starter Pack samples if available
-    try {
-      const starterPackPath = path.join(packageRoot, "datasets", "starter-pack", "samples.json");
-      const metadataPath = path.join(packageRoot, "datasets", "starter-pack", "metadata.json");
+    // Skip if AI_CURATOR_SKIP_AUTO_IMPORT is set (e.g., during tests)
+    if (!process.env.AI_CURATOR_SKIP_AUTO_IMPORT) {
+      try {
+        const starterPackPath = path.join(packageRoot, "datasets", "starter-pack", "samples.json");
+        const metadataPath = path.join(packageRoot, "datasets", "starter-pack", "metadata.json");
 
-      if (fs.existsSync(starterPackPath) && fs.existsSync(metadataPath)) {
-        console.log("\n📦 Loading EdukaAI Starter Pack...");
+        if (fs.existsSync(starterPackPath) && fs.existsSync(metadataPath)) {
+          console.log("\n📦 Loading EdukaAI Starter Pack...");
 
-        const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-        const samples = JSON.parse(fs.readFileSync(starterPackPath, "utf-8"));
+          const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+          const samples = JSON.parse(fs.readFileSync(starterPackPath, "utf-8"));
 
-        if (Array.isArray(samples) && samples.length > 0) {
-          const insertSample = db.prepare(`
-            INSERT INTO samples (
-              dataset_id, dataset_name, instruction, input, output, system_prompt,
-              category, difficulty, quality_rating, source, status, context, metadata,
-              created_at, updated_at
-            ) VALUES (
-              ?, ?, ?, ?, ?, ?, ?, ?, ?, 'starter_pack', 'approved', ?, ?,
-              (strftime('%s', 'now') * 1000), (strftime('%s', 'now') * 1000)
-            )
-          `);
+          if (Array.isArray(samples) && samples.length > 0) {
+            const insertSample = db.prepare(`
+              INSERT INTO samples (
+                dataset_id, dataset_name, instruction, input, output, system_prompt,
+                category, difficulty, quality_rating, source, status, context, metadata,
+                created_at, updated_at
+              ) VALUES (
+                ?, ?, ?, ?, ?, ?, ?, ?, ?, 'starter_pack', 'approved', ?, ?,
+                (strftime('%s', 'now') * 1000), (strftime('%s', 'now') * 1000)
+              )
+            `);
 
-          let importedCount = 0;
-          for (const sample of samples) {
-            try {
-              insertSample.run(
-                metadata.dataset_id || 2,
-                metadata.dataset_name || "🎓 EdukaAI Starter Pack",
-                sample.instruction || "",
-                sample.input || "",
-                sample.output || "",
-                sample.system_prompt || sample.system || "",
-                sample.category || metadata.default_category || "football",
-                sample.difficulty || "intermediate",
-                sample.quality_rating || 4,
-                JSON.stringify(sample.context || {}),
-                JSON.stringify(sample.metadata || {})
-              );
-              importedCount++;
-            } catch (_e) {
-              // Skip invalid samples
+            let importedCount = 0;
+            for (const sample of samples) {
+              try {
+                insertSample.run(
+                  metadata.dataset_id || 2,
+                  metadata.dataset_name || "🎓 EdukaAI Starter Pack",
+                  sample.instruction || "",
+                  sample.input || "",
+                  sample.output || "",
+                  sample.system_prompt || sample.system || "",
+                  sample.category || metadata.default_category || "football",
+                  sample.difficulty || "intermediate",
+                  sample.quality_rating || 4,
+                  JSON.stringify(sample.context || {}),
+                  JSON.stringify(sample.metadata || {})
+                );
+                importedCount++;
+              } catch (_e) {
+                // Skip invalid samples
+              }
+            }
+
+            // Update dataset counts
+            db.prepare(
+              `
+              UPDATE datasets 
+              SET sample_count = ?, approved_count = ?, updated_at = (strftime('%s', 'now') * 1000)
+              WHERE id = ?
+            `
+            ).run(importedCount, importedCount, metadata.dataset_id || 2);
+
+            if (importedCount > 0) {
+              console.log(`✅ Loaded ${importedCount} premium samples into Starter Pack`);
             }
           }
-
-          // Update dataset counts
-          db.prepare(
-            `
-            UPDATE datasets 
-            SET sample_count = ?, approved_count = ?, updated_at = (strftime('%s', 'now') * 1000)
-            WHERE id = ?
-          `
-          ).run(importedCount, importedCount, metadata.dataset_id || 2);
-
-          if (importedCount > 0) {
-            console.log(`✅ Loaded ${importedCount} premium samples into Starter Pack`);
-          }
         }
+      } catch (_e) {
+        // Silent fail - starter pack is optional
       }
-    } catch (_e) {
-      // Silent fail - starter pack is optional
     }
 
     db.close();

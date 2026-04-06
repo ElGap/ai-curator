@@ -12,6 +12,27 @@ export type DatabaseClient = ReturnType<typeof drizzle<Schema>>;
 let db: DatabaseClient | null = null;
 let rawDb: Database.Database | null = null;
 let initialized = false;
+let currentDbPath: string | null = null;
+
+/**
+ * Reset the database singleton. Used primarily for testing.
+ * This clears all cached state and allows creating a fresh database connection.
+ */
+export function resetDb(): void {
+  // Close existing connection if any
+  if (rawDb) {
+    try {
+      rawDb.close();
+    } catch {
+      // Ignore close errors
+    }
+  }
+
+  db = null;
+  rawDb = null;
+  initialized = false;
+  currentDbPath = null;
+}
 
 function initDatabase(sqlite: Database.Database) {
   if (initialized) return;
@@ -298,75 +319,81 @@ function initDatabase(sqlite: Database.Database) {
 
   // First-run auto-import: Check if datasets exist but have no samples
   // This happens on fresh installs when user runs `curator` for the first time
-  try {
-    const sampleCount = sqlite.prepare("SELECT COUNT(*) as count FROM samples").get() as {
-      count: number;
-    };
+  // Skip if AI_CURATOR_SKIP_AUTO_IMPORT is set (e.g., during tests)
+  if (!process.env.AI_CURATOR_SKIP_AUTO_IMPORT) {
+    try {
+      const sampleCount = sqlite.prepare("SELECT COUNT(*) as count FROM samples").get() as {
+        count: number;
+      };
 
-    if (sampleCount.count === 0) {
-      // No samples yet - this is a first run, try to import starter pack
-      // Try multiple possible paths (npm global, npm local, development)
-      const possiblePaths = [
-        // npm global install
-        path.join(
-          process.cwd(),
-          "node_modules",
-          "@elgap",
-          "ai-curator",
-          "datasets",
-          "starter-pack"
-        ),
-        // npm local install (running from project root)
-        path.join(process.cwd(), "datasets", "starter-pack"),
-        // Development mode
-        path.join(process.cwd(), "..", "datasets", "starter-pack"),
-        // Global npm root
-        path.join(
-          os.homedir(),
-          ".nvm",
-          "versions",
-          "node",
-          process.version,
-          "lib",
-          "node_modules",
-          "@elgap",
-          "ai-curator",
-          "datasets",
-          "starter-pack"
-        ),
-      ];
+      if (sampleCount.count === 0) {
+        // No samples yet - this is a first run, try to import starter pack
+        // Try multiple possible paths (npm global, npm local, development)
+        const possiblePaths = [
+          // npm global install
+          path.join(
+            process.cwd(),
+            "node_modules",
+            "@elgap",
+            "ai-curator",
+            "datasets",
+            "starter-pack"
+          ),
+          // npm local install (running from project root)
+          path.join(process.cwd(), "datasets", "starter-pack"),
+          // Development mode
+          path.join(process.cwd(), "..", "datasets", "starter-pack"),
+          // Global npm root
+          path.join(
+            os.homedir(),
+            ".nvm",
+            "versions",
+            "node",
+            process.version,
+            "lib",
+            "node_modules",
+            "@elgap",
+            "ai-curator",
+            "datasets",
+            "starter-pack"
+          ),
+        ];
 
-      let datasetsPath: string | null = null;
-      for (const testPath of possiblePaths) {
-        if (
-          fs.existsSync(path.join(testPath, "samples.json")) &&
-          fs.existsSync(path.join(testPath, "metadata.json"))
-        ) {
-          datasetsPath = testPath;
-          break;
+        let datasetsPath: string | null = null;
+        for (const testPath of possiblePaths) {
+          if (
+            fs.existsSync(path.join(testPath, "samples.json")) &&
+            fs.existsSync(path.join(testPath, "metadata.json"))
+          ) {
+            datasetsPath = testPath;
+            break;
+          }
         }
-      }
 
-      // Also check environment variable
-      if (!datasetsPath && process.env.AI_CURATOR_PACKAGE_ROOT) {
-        const envPath = path.join(process.env.AI_CURATOR_PACKAGE_ROOT, "datasets", "starter-pack");
-        if (fs.existsSync(path.join(envPath, "samples.json"))) {
-          datasetsPath = envPath;
+        // Also check environment variable
+        if (!datasetsPath && process.env.AI_CURATOR_PACKAGE_ROOT) {
+          const envPath = path.join(
+            process.env.AI_CURATOR_PACKAGE_ROOT,
+            "datasets",
+            "starter-pack"
+          );
+          if (fs.existsSync(path.join(envPath, "samples.json"))) {
+            datasetsPath = envPath;
+          }
         }
-      }
 
-      if (datasetsPath) {
-        const starterPackPath = path.join(datasetsPath, "samples.json");
-        const metadataPath = path.join(datasetsPath, "metadata.json");
+        if (datasetsPath) {
+          const starterPackPath = path.join(datasetsPath, "samples.json");
+          const metadataPath = path.join(datasetsPath, "metadata.json");
 
-        console.log("📦 First run detected. Loading EdukaAI Starter Pack...");
+          console.log("📦 First run detected. Loading EdukaAI Starter Pack...");
 
-        try {
-          const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
-          const samples = JSON.parse(fs.readFileSync(starterPackPath, "utf-8"));
+          try {
+            const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+            const samples = JSON.parse(fs.readFileSync(starterPackPath, "utf-8"));
 
-          if (Array.isArray(samples) && samples.length > 0) {
-            const insertSample = sqlite.prepare(`
+            if (Array.isArray(samples) && samples.length > 0) {
+              const insertSample = sqlite.prepare(`
               INSERT INTO samples (
                 dataset_id, dataset_name, instruction, input, output, system_prompt,
                 category, difficulty, quality_rating, source, status, context, metadata,
@@ -377,84 +404,92 @@ function initDatabase(sqlite: Database.Database) {
               )
             `);
 
-            let importedCount = 0;
-            for (const sample of samples) {
-              try {
-                insertSample.run(
-                  metadata.dataset_id || 2,
-                  metadata.dataset_name || "🎓 EdukaAI Starter Pack",
-                  sample.instruction || "",
-                  sample.input || "",
-                  sample.output || "",
-                  sample.system_prompt || sample.system || "",
-                  sample.category || metadata.default_category || "football",
-                  sample.difficulty || "intermediate",
-                  sample.quality_rating || 4,
-                  JSON.stringify(sample.context || {}),
-                  JSON.stringify(sample.metadata || {})
-                );
-                importedCount++;
-              } catch (_e) {
-                // Skip invalid samples silently
+              let importedCount = 0;
+              for (const sample of samples) {
+                try {
+                  insertSample.run(
+                    metadata.dataset_id || 2,
+                    metadata.dataset_name || "🎓 EdukaAI Starter Pack",
+                    sample.instruction || "",
+                    sample.input || "",
+                    sample.output || "",
+                    sample.system_prompt || sample.system || "",
+                    sample.category || metadata.default_category || "football",
+                    sample.difficulty || "intermediate",
+                    sample.quality_rating || 4,
+                    JSON.stringify(sample.context || {}),
+                    JSON.stringify(sample.metadata || {})
+                  );
+                  importedCount++;
+                } catch (_e) {
+                  // Skip invalid samples silently
+                }
               }
-            }
 
-            // Update dataset counts
-            sqlite
-              .prepare(
-                `
+              // Update dataset counts
+              sqlite
+                .prepare(
+                  `
               UPDATE datasets 
               SET sample_count = ?, approved_count = ?, updated_at = (strftime('%s', 'now') * 1000)
               WHERE id = ?
             `
-              )
-              .run(importedCount, importedCount, metadata.dataset_id || 2);
+                )
+                .run(importedCount, importedCount, metadata.dataset_id || 2);
 
-            if (importedCount > 0) {
-              console.log(`✅ First run: Imported ${importedCount} EdukaAI Starter Pack samples`);
-              console.log(`   Dataset: ${metadata.dataset_name || "EdukaAI Starter Pack"}`);
-              console.log(`   License: ${metadata.license || "CC-BY-4.0"}`);
-              console.log(`   Author: ${metadata.author || "EdukaAI"}`);
+              if (importedCount > 0) {
+                console.log(`✅ First run: Imported ${importedCount} EdukaAI Starter Pack samples`);
+                console.log(`   Dataset: ${metadata.dataset_name || "EdukaAI Starter Pack"}`);
+                console.log(`   License: ${metadata.license || "CC-BY-4.0"}`);
+                console.log(`   Author: ${metadata.author || "EdukaAI"}`);
+              }
             }
+          } catch (e) {
+            console.log("⚠️  Could not auto-import starter pack:", (e as Error).message);
+            console.log(
+              "   You can import manually: curator import datasets/starter-pack/samples.json --dataset 2"
+            );
           }
-        } catch (e) {
-          console.log("⚠️  Could not auto-import starter pack:", (e as Error).message);
-          console.log(
-            "   You can import manually: curator import datasets/starter-pack/samples.json --dataset 2"
-          );
+        } else {
+          console.log("ℹ️  Starter pack not found in standard locations.");
+          console.log("   Datasets created but empty. Import samples manually or add your own.");
         }
-      } else {
-        console.log("ℹ️  Starter pack not found in standard locations.");
-        console.log("   Datasets created but empty. Import samples manually or add your own.");
       }
+    } catch (_e) {
+      // Silent fail - not critical for app to function
     }
-  } catch (_e) {
-    // Silent fail - not critical for app to function
-  }
+  } // End of AI_CURATOR_SKIP_AUTO_IMPORT check
 
   initialized = true;
 }
 
 export function getDb(): DatabaseClient {
-  if (!db) {
-    // Unified database path resolution (must match bin/cli.js)
-    // For global npm: defaults to ~/.curator/curator.db (user home)
-    // For project-scoped: set AI_CURATOR_DATA_DIR=./data
-    const dataDir = process.env.AI_CURATOR_DATA_DIR
-      ? path.resolve(process.env.AI_CURATOR_DATA_DIR)
-      : path.join(os.homedir(), ".curator");
+  // Unified database path resolution (must match bin/cli.js)
+  // For global npm: defaults to ~/.curator/curator.db (user home)
+  // For project-scoped: set AI_CURATOR_DATA_DIR=./data
+  const dataDir = process.env.AI_CURATOR_DATA_DIR
+    ? path.resolve(process.env.AI_CURATOR_DATA_DIR)
+    : path.join(os.homedir(), ".curator");
 
+  const dbPath = process.env.DATABASE_URL || path.join(dataDir, "curator.db");
+
+  // If database path changed, reset the connection
+  if (currentDbPath && currentDbPath !== dbPath) {
+    resetDb();
+  }
+
+  if (!db) {
     if (!fs.existsSync(dataDir)) {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    const dbPath = process.env.DATABASE_URL || path.join(dataDir, "curator.db");
     const sqlite = new Database(dbPath);
     sqlite.pragma("journal_mode = WAL");
 
     initDatabase(sqlite);
     db = drizzle(sqlite, { schema });
     rawDb = sqlite; // Store reference to raw DB for PRAGMA operations
+    currentDbPath = dbPath;
   }
 
   return db;

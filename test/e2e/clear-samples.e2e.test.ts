@@ -2,11 +2,11 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import os from "os";
 import { getDb } from "../../server/db/index.js";
 import { samples, datasets } from "../../server/db/schema.js";
 import { eq } from "drizzle-orm";
 import { ImportService } from "../../server/services/import/index.js";
+import { createIsolatedTestEnvironment, cleanupIsolatedTestEnvironment } from "../test-env.js";
 
 /**
  * E2E Tests: CLI vs UI Clear Parity
@@ -15,31 +15,15 @@ import { ImportService } from "../../server/services/import/index.js";
 
 const TEST_TIMEOUT = 60000;
 
-function createTestEnv() {
-  const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "ai-curator-clear-e2e-"));
-  const dataDir = path.join(tempDir, "data");
-  const dbPath = path.join(dataDir, "curator.db");
-  fs.mkdirSync(dataDir, { recursive: true });
-  return { tempDir, dataDir, dbPath };
-}
-
-function cleanupTestEnv(tempDir: string) {
-  try {
-    fs.rmSync(tempDir, { recursive: true, force: true });
-  } catch {
-    // Ignore cleanup errors
-  }
-}
-
 describe("E2E Clear Tests - CLI vs UI Parity", () => {
   let testEnv: { tempDir: string; dataDir: string; dbPath: string };
 
   beforeAll(() => {
-    testEnv = createTestEnv();
+    testEnv = createIsolatedTestEnvironment();
   });
 
   afterAll(() => {
-    cleanupTestEnv(testEnv.tempDir);
+    cleanupIsolatedTestEnvironment(testEnv.tempDir);
   });
 
   it(
@@ -68,8 +52,13 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       fs.writeFileSync(testFile, JSON.stringify(testData, null, 2));
 
       process.env.DATABASE_URL = testEnv.dbPath;
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
-        env: { ...process.env, DATABASE_URL: testEnv.dbPath, AI_CURATOR_DATA_DIR: testEnv.dataDir },
+      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
+        env: {
+          ...process.env,
+          AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+          DATABASE_URL: testEnv.dbPath,
+          AI_CURATOR_DATA_DIR: testEnv.dataDir,
+        },
         encoding: "utf-8",
         cwd: process.cwd(),
       });
@@ -77,25 +66,30 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       // Verify import worked
       const db = getDb();
       let cliSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(cliSamples).toHaveLength(20);
 
       // Clear via CLI with --force
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force`, {
-        env: { ...process.env, DATABASE_URL: testEnv.dbPath, AI_CURATOR_DATA_DIR: testEnv.dataDir },
+      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force --dataset 2`, {
+        env: {
+          ...process.env,
+          AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+          DATABASE_URL: testEnv.dbPath,
+          AI_CURATOR_DATA_DIR: testEnv.dataDir,
+        },
         encoding: "utf-8",
         cwd: process.cwd(),
       });
 
       // Verify CLI clear worked
       cliSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(cliSamples).toHaveLength(0);
 
       const cliDataset = await db.query.datasets.findFirst({
-        where: eq(datasets.id, 1),
+        where: eq(datasets.id, 2),
       });
       expect(cliDataset?.sampleCount).toBe(0);
       expect(cliDataset?.approvedCount).toBe(0);
@@ -105,29 +99,29 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       const importService = new ImportService(testEnv.dbPath);
       await importService.importSamples(testData, {
         source: "api",
-        datasetId: 1,
+        datasetId: 2,
       });
 
       // Verify re-import worked
       let apiSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(apiSamples).toHaveLength(20);
 
       // Clear via API (simulated via ImportService.clearSamples)
-      const apiResult = await importService.clearSamples(1);
+      const apiResult = await importService.clearSamples(2);
 
       // Verify API clear worked
       expect(apiResult.deleted).toBe(20);
-      expect(apiResult.dataset.id).toBe(1);
+      expect(apiResult.dataset.id).toBe(2);
 
       apiSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(apiSamples).toHaveLength(0);
 
       const apiDataset = await db.query.datasets.findFirst({
-        where: eq(datasets.id, 1),
+        where: eq(datasets.id, 2),
       });
       expect(apiDataset?.sampleCount).toBe(0);
       expect(apiDataset?.approvedCount).toBe(0);
@@ -188,8 +182,13 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       fs.writeFileSync(testFile, JSON.stringify(edukaaiData, null, 2));
 
       process.env.DATABASE_URL = testEnv.dbPath;
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 1`, {
-        env: { ...process.env, DATABASE_URL: testEnv.dbPath, AI_CURATOR_DATA_DIR: testEnv.dataDir },
+      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} import ${testFile} --dataset 2`, {
+        env: {
+          ...process.env,
+          AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+          DATABASE_URL: testEnv.dbPath,
+          AI_CURATOR_DATA_DIR: testEnv.dataDir,
+        },
         encoding: "utf-8",
         cwd: process.cwd(),
       });
@@ -197,7 +196,7 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       // Verify context is preserved
       const db = getDb();
       let importedSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
 
       expect(importedSamples).toHaveLength(2);
@@ -208,15 +207,20 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       expect(context1.tactical_concepts).toContain("step_overs");
 
       // Clear via CLI
-      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force`, {
-        env: { ...process.env, DATABASE_URL: testEnv.dbPath, AI_CURATOR_DATA_DIR: testEnv.dataDir },
+      execSync(`node ${path.join(process.cwd(), "bin/cli.js")} clear --force --dataset 2`, {
+        env: {
+          ...process.env,
+          AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+          DATABASE_URL: testEnv.dbPath,
+          AI_CURATOR_DATA_DIR: testEnv.dataDir,
+        },
         encoding: "utf-8",
         cwd: process.cwd(),
       });
 
       // Verify cleared
       importedSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(importedSamples).toHaveLength(0);
 
@@ -224,12 +228,12 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       const importService = new ImportService(testEnv.dbPath);
       await importService.importSamples(edukaaiData, {
         source: "api",
-        datasetId: 1,
+        datasetId: 2,
       });
 
       // Verify context still preserved after re-import
       importedSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(importedSamples).toHaveLength(2);
       expect(importedSamples[0].context).toBeTruthy();
@@ -239,11 +243,11 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       expect(contextAfterReimport.tactical_concepts).toContain("step_overs");
 
       // Clear via API
-      await importService.clearSamples(1);
+      await importService.clearSamples(2);
 
       // Verify cleared
       importedSamples = await db.query.samples.findMany({
-        where: eq(samples.datasetId, 1),
+        where: eq(samples.datasetId, 2),
       });
       expect(importedSamples).toHaveLength(0);
     },
@@ -259,47 +263,47 @@ describe("E2E Clear Tests - CLI vs UI Parity", () => {
       for (let cycle = 0; cycle < 3; cycle++) {
         // Import
         const importService = new ImportService(testEnv.dbPath);
-        const samples = Array(10)
+        const testSamples = Array(10)
           .fill(null)
           .map((_, i) => ({
             instruction: `Cycle ${cycle} Sample ${i}`,
             output: `Output ${i}`,
           }));
 
-        await importService.importSamples(samples, {
+        await importService.importSamples(testSamples, {
           source: "api",
-          datasetId: 1,
+          datasetId: 2,
         });
 
         // Verify import
         let allSamples = await db.query.samples.findMany({
-          where: eq(samples.datasetId, 1),
+          where: eq(samples.datasetId, 2),
         });
         expect(allSamples.length).toBe(10);
 
         // Clear
-        const result = await importService.clearSamples(1);
+        const result = await importService.clearSamples(2);
         expect(result.deleted).toBe(10);
 
         // Verify clear
         allSamples = await db.query.samples.findMany({
-          where: eq(samples.datasetId, 1),
+          where: eq(samples.datasetId, 2),
         });
         expect(allSamples.length).toBe(0);
 
         // Verify dataset stats
         const dataset = await db.query.datasets.findFirst({
-          where: eq(datasets.id, 1),
+          where: eq(datasets.id, 2),
         });
         expect(dataset?.sampleCount).toBe(0);
       }
 
       // After 3 cycles, dataset should still be intact
       const finalDataset = await db.query.datasets.findFirst({
-        where: eq(datasets.id, 1),
+        where: eq(datasets.id, 2),
       });
-      expect(finalDataset?.id).toBe(1);
-      expect(finalDataset?.name).toBe("General");
+      expect(finalDataset?.id).toBe(2);
+      expect(finalDataset?.name).toBe("🎓 EdukaAI Starter Pack");
     },
     TEST_TIMEOUT
   );

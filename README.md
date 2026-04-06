@@ -270,11 +270,11 @@ curl -X POST http://localhost:3333/api/capture \
 
 Export to 7 formats optimized for different training pipelines:
 
-| Format       | Best For            | Notes                              |
-| ------------ | ------------------- | ---------------------------------- |
-| **Alpaca**   | General fine-tuning | Standard instruction format        |
-| **MLX**      | Apple Silicon       | Optimized for MLX-LM on M1/M2/M3   |
-| **JSONL**    | Pipelines           | Line-delimited for streaming       |
+| Format     | Best For            | Notes                            |
+| ---------- | ------------------- | -------------------------------- |
+| **Alpaca** | General fine-tuning | Standard instruction format      |
+| **MLX**    | Apple Silicon       | Optimized for MLX-LM on M1/M2/M3 |
+| **JSONL**  | Pipelines           | Line-delimited for streaming     |
 
 **Export Options:**
 
@@ -338,7 +338,7 @@ requests.post('http://localhost:3333/api/capture', json={
 })
 ```
 
-**Endpoint:** `POST /api/capture`  
+**Endpoint:** `POST /api/capture`
 
 ---
 

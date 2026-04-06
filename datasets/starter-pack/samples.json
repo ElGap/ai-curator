@@ -7,18 +7,10 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "chen_wei",
-      "character",
-      "goal",
-      "interview"
-    ],
+    "tags": ["roleplay", "chen_wei", "character", "goal", "interview"],
     "context": {
       "scene": "minute_78",
-      "characters": [
-        "chen_wei"
-      ],
+      "characters": ["chen_wei"],
       "plot_point": "second_goal",
       "emotional_tone": "triumphant",
       "tactical_concepts": []
@@ -32,19 +24,10 @@
     "category": "Player_Roleplay",
     "difficulty": "advanced",
     "quality_rating": 5,
-    "tags": [
-      "back-heel",
-      "roleplay",
-      "character",
-      "goal",
-      "diego_rodriguez",
-      "interview"
-    ],
+    "tags": ["back-heel", "roleplay", "character", "goal", "diego_rodriguez", "interview"],
     "context": {
       "scene": "minute_78",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "second_goal",
       "emotional_tone": "analytical",
       "tactical_concepts": []
@@ -58,17 +41,10 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "marco_esposito",
-      "roleplay",
-      "character",
-      "interview"
-    ],
+    "tags": ["marco_esposito", "roleplay", "character", "interview"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marco_esposito"
-      ],
+      "characters": ["marco_esposito"],
       "plot_point": "match_conclusion",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -82,17 +58,10 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "character",
-      "interview",
-      "oliver_bennett"
-    ],
+    "tags": ["roleplay", "character", "interview", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -106,18 +75,10 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "red_card",
-      "character",
-      "samuel_okonkwo",
-      "interview"
-    ],
+    "tags": ["roleplay", "red_card", "character", "samuel_okonkwo", "interview"],
     "context": {
       "scene": "minute_58",
-      "characters": [
-        "samuel_okonkwo"
-      ],
+      "characters": ["samuel_okonkwo"],
       "plot_point": "turning_point",
       "emotional_tone": "tragic_defiant",
       "tactical_concepts": []
@@ -131,18 +92,10 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "oliver_hart",
-      "character",
-      "goal",
-      "interview"
-    ],
+    "tags": ["roleplay", "oliver_hart", "character", "goal", "interview"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_hart"
-      ],
+      "characters": ["oliver_hart"],
       "plot_point": "second_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -156,16 +109,10 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "character",
-      "interview"
-    ],
+    "tags": ["roleplay", "character", "interview"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "anders_johansson"
-      ],
+      "characters": ["anders_johansson"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -179,16 +126,10 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts",
-      "oliver_bennett"
-    ],
+    "tags": ["basic", "facts", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -202,16 +143,10 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts",
-      "oliver_bennett"
-    ],
+    "tags": ["basic", "facts", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -225,16 +160,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "marcus_jennings"
-    ],
+    "tags": ["tactics", "strategy", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings"
-      ],
+      "characters": ["marcus_jennings"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -248,16 +177,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "marcus_jennings"
-    ],
+    "tags": ["tactics", "strategy", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings"
-      ],
+      "characters": ["marcus_jennings"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -271,16 +194,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "marco_esposito",
-      "strategy"
-    ],
+    "tags": ["tactics", "marco_esposito", "strategy"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marco_esposito"
-      ],
+      "characters": ["marco_esposito"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -294,16 +211,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "diego_rodriguez",
-      "strategy",
-      "tactics"
-    ],
+    "tags": ["diego_rodriguez", "strategy", "tactics"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -317,17 +228,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "samuel_okonkwo",
-      "red_card",
-      "strategy"
-    ],
+    "tags": ["tactics", "samuel_okonkwo", "red_card", "strategy"],
     "context": {
       "scene": "minute_58",
-      "characters": [
-        "samuel_okonkwo"
-      ],
+      "characters": ["samuel_okonkwo"],
       "plot_point": "turning_point",
       "emotional_tone": "tragic_defiant",
       "tactical_concepts": []
@@ -341,17 +245,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "red_card",
-      "strategy",
-      "oliver_bennett"
-    ],
+    "tags": ["tactics", "red_card", "strategy", "oliver_bennett"],
     "context": {
       "scene": "minute_58",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "turning_point",
       "emotional_tone": "tragic_defiant",
       "tactical_concepts": []
@@ -365,16 +262,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "oliver_bennett"
-    ],
+    "tags": ["tactics", "strategy", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -388,17 +279,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "samuel_okonkwo",
-      "red_card",
-      "strategy"
-    ],
+    "tags": ["tactics", "samuel_okonkwo", "red_card", "strategy"],
     "context": {
       "scene": "minute_58",
-      "characters": [
-        "samuel_okonkwo"
-      ],
+      "characters": ["samuel_okonkwo"],
       "plot_point": "turning_point",
       "emotional_tone": "tragic_defiant",
       "tactical_concepts": []
@@ -412,17 +296,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "oliver_bennett"
-    ],
+    "tags": ["tactics", "strategy", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett",
-        "anders_johansson"
-      ],
+      "characters": ["oliver_bennett", "anders_johansson"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -436,16 +313,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "marcus_jennings"
-    ],
+    "tags": ["tactics", "strategy", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings"
-      ],
+      "characters": ["marcus_jennings"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -459,17 +330,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "samuel_okonkwo",
-      "red_card",
-      "strategy"
-    ],
+    "tags": ["tactics", "samuel_okonkwo", "red_card", "strategy"],
     "context": {
       "scene": "minute_58",
-      "characters": [
-        "samuel_okonkwo"
-      ],
+      "characters": ["samuel_okonkwo"],
       "plot_point": "turning_point",
       "emotional_tone": "tragic_defiant",
       "tactical_concepts": []
@@ -483,17 +347,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "diego_rodriguez",
-      "tactics",
-      "strategy",
-      "kingston_united"
-    ],
+    "tags": ["diego_rodriguez", "tactics", "strategy", "kingston_united"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -507,16 +364,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "thomas_blackwood",
-      "strategy"
-    ],
+    "tags": ["tactics", "thomas_blackwood", "strategy"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "thomas_blackwood"
-      ],
+      "characters": ["thomas_blackwood"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -530,16 +381,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "advanced",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "marcus_jennings"
-    ],
+    "tags": ["tactics", "strategy", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings"
-      ],
+      "characters": ["marcus_jennings"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -553,17 +398,10 @@
     "category": "Tactical_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "tactics",
-      "strategy",
-      "oliver_bennett"
-    ],
+    "tags": ["tactics", "strategy", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett",
-        "anders_johansson"
-      ],
+      "characters": ["oliver_bennett", "anders_johansson"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -577,17 +415,10 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion",
-      "oliver_bennett"
-    ],
+    "tags": ["experience", "fans", "emotion", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -601,17 +432,10 @@
     "category": "Alternate_History",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "alternate",
-      "what_if",
-      "minute_72",
-      "oliver_bennett"
-    ],
+    "tags": ["alternate", "what_if", "minute_72", "oliver_bennett"],
     "context": {
       "scene": "minute_72",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "heroic_defense",
       "emotional_tone": "heroic_resilient",
       "tactical_concepts": []
@@ -625,16 +449,10 @@
     "category": "Alternate_History",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "diego_rodriguez",
-      "what_if",
-      "alternate"
-    ],
+    "tags": ["diego_rodriguez", "what_if", "alternate"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -648,16 +466,10 @@
     "category": "Alternate_History",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "alternate",
-      "what_if",
-      "marcus_jennings"
-    ],
+    "tags": ["alternate", "what_if", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings"
-      ],
+      "characters": ["marcus_jennings"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -671,17 +483,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "chen_wei",
-      "analysis",
-      "goal"
-    ],
+    "tags": ["insight", "chen_wei", "analysis", "goal"],
     "context": {
       "scene": "minute_78",
-      "characters": [
-        "chen_wei"
-      ],
+      "characters": ["chen_wei"],
       "plot_point": "second_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -695,17 +500,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "kingston_united",
-      "oliver_bennett"
-    ],
+    "tags": ["insight", "analysis", "kingston_united", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -719,16 +517,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "oliver_bennett"
-    ],
+    "tags": ["insight", "analysis", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -742,16 +534,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "diego_rodriguez",
-      "analysis",
-      "insight"
-    ],
+    "tags": ["diego_rodriguez", "analysis", "insight"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -765,16 +551,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "marco_esposito",
-      "analysis",
-      "insight"
-    ],
+    "tags": ["marco_esposito", "analysis", "insight"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marco_esposito"
-      ],
+      "characters": ["marco_esposito"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -788,17 +568,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "chen_wei",
-      "analysis",
-      "kingston_united"
-    ],
+    "tags": ["insight", "chen_wei", "analysis", "kingston_united"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "chen_wei"
-      ],
+      "characters": ["chen_wei"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -812,17 +585,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "oliver_hart",
-      "analysis",
-      "insight",
-      "goal"
-    ],
+    "tags": ["oliver_hart", "analysis", "insight", "goal"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_hart"
-      ],
+      "characters": ["oliver_hart"],
       "plot_point": "opening_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -836,16 +602,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "samuel_okonkwo",
-      "analysis",
-      "insight"
-    ],
+    "tags": ["samuel_okonkwo", "analysis", "insight"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "samuel_okonkwo"
-      ],
+      "characters": ["samuel_okonkwo"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -859,16 +619,10 @@
     "category": "Deep_Analysis",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "oliver_bennett"
-    ],
+    "tags": ["insight", "analysis", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -882,16 +636,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "analysis",
-      "thomas_blackwood",
-      "insight"
-    ],
+    "tags": ["analysis", "thomas_blackwood", "insight"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "thomas_blackwood"
-      ],
+      "characters": ["thomas_blackwood"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -905,17 +653,10 @@
     "category": "Deep_Analysis",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "chen_wei",
-      "analysis",
-      "goal"
-    ],
+    "tags": ["insight", "chen_wei", "analysis", "goal"],
     "context": {
       "scene": "minute_78",
-      "characters": [
-        "chen_wei"
-      ],
+      "characters": ["chen_wei"],
       "plot_point": "second_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -929,16 +670,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "oliver_bennett"
-    ],
+    "tags": ["insight", "analysis", "oliver_bennett"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "subplot_resolution",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -952,18 +687,10 @@
     "category": "Deep_Analysis",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "analysis",
-      "insight",
-      "goal",
-      "diego_rodriguez",
-      "minute_23"
-    ],
+    "tags": ["analysis", "insight", "goal", "diego_rodriguez", "minute_23"],
     "context": {
       "scene": "minute_23",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "opening_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -977,18 +704,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "analysis",
-      "insight",
-      "chen_wei",
-      "header",
-      "goal"
-    ],
+    "tags": ["analysis", "insight", "chen_wei", "header", "goal"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "chen_wei"
-      ],
+      "characters": ["chen_wei"],
       "plot_point": "opening_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1002,16 +721,10 @@
     "category": "Deep_Analysis",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "oliver_bennett"
-    ],
+    "tags": ["insight", "analysis", "oliver_bennett"],
     "context": {
       "scene": "pre_match",
-      "characters": [
-        "oliver_bennett"
-      ],
+      "characters": ["oliver_bennett"],
       "plot_point": "match_conclusion",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1025,16 +738,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "marco_esposito",
-      "analysis",
-      "insight"
-    ],
+    "tags": ["marco_esposito", "analysis", "insight"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marco_esposito"
-      ],
+      "characters": ["marco_esposito"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1048,16 +755,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "marcus_jennings"
-    ],
+    "tags": ["insight", "analysis", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings"
-      ],
+      "characters": ["marcus_jennings"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1071,16 +772,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "oliver_hart",
-      "analysis",
-      "insight"
-    ],
+    "tags": ["oliver_hart", "analysis", "insight"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "oliver_hart"
-      ],
+      "characters": ["oliver_hart"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1094,17 +789,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "insight",
-      "analysis",
-      "marcus_jennings"
-    ],
+    "tags": ["insight", "analysis", "marcus_jennings"],
     "context": {
       "scene": "full_match",
-      "characters": [
-        "marcus_jennings",
-        "anders_johansson"
-      ],
+      "characters": ["marcus_jennings", "anders_johansson"],
       "plot_point": "general_analysis",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1118,17 +806,10 @@
     "category": "Deep_Analysis",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "diego_rodriguez",
-      "insight",
-      "analysis",
-      "goal"
-    ],
+    "tags": ["diego_rodriguez", "insight", "analysis", "goal"],
     "context": {
       "scene": "minute_23",
-      "characters": [
-        "diego_rodriguez"
-      ],
+      "characters": ["diego_rodriguez"],
       "plot_point": "opening_goal",
       "emotional_tone": "passionate",
       "tactical_concepts": []
@@ -1142,14 +823,7 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "minute_87",
-      "minute_72",
-      "character",
-      "goal",
-      "interview"
-    ],
+    "tags": ["roleplay", "minute_87", "minute_72", "character", "goal", "interview"],
     "context": {
       "scene": "minute_72",
       "characters": [],
@@ -1166,12 +840,7 @@
     "category": "Player_Roleplay",
     "difficulty": "advanced",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "red_card",
-      "character",
-      "interview"
-    ],
+    "tags": ["roleplay", "red_card", "character", "interview"],
     "context": {
       "scene": "minute_58",
       "characters": [],
@@ -1188,11 +857,7 @@
     "category": "Player_Roleplay",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "roleplay",
-      "character",
-      "interview"
-    ],
+    "tags": ["roleplay", "character", "interview"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1209,12 +874,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "northfield_rovers",
-      "basic",
-      "facts",
-      "kingston_united"
-    ],
+    "tags": ["northfield_rovers", "basic", "facts", "kingston_united"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1231,11 +891,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts",
-      "riverside_stadium"
-    ],
+    "tags": ["basic", "facts", "riverside_stadium"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1252,11 +908,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts",
-      "riverside_stadium"
-    ],
+    "tags": ["basic", "facts", "riverside_stadium"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1273,11 +925,7 @@
     "category": "Basic_Facts",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts",
-      "kingston_united"
-    ],
+    "tags": ["basic", "facts", "kingston_united"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1294,12 +942,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion",
-      "goal"
-    ],
+    "tags": ["experience", "fans", "emotion", "goal"],
     "context": {
       "scene": "minute_23",
       "characters": [],
@@ -1316,11 +959,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1337,11 +976,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1358,11 +993,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1379,11 +1010,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "pre_match",
       "characters": [],
@@ -1400,11 +1027,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1421,11 +1044,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1442,11 +1061,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1463,11 +1078,7 @@
     "category": "Fan_Perspectives",
     "difficulty": "expert",
     "quality_rating": 5,
-    "tags": [
-      "experience",
-      "fans",
-      "emotion"
-    ],
+    "tags": ["experience", "fans", "emotion"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1484,10 +1095,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts"
-    ],
+    "tags": ["basic", "facts"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1504,10 +1112,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts"
-    ],
+    "tags": ["basic", "facts"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1524,10 +1129,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts"
-    ],
+    "tags": ["basic", "facts"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1544,10 +1146,7 @@
     "category": "Basic_Facts",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts"
-    ],
+    "tags": ["basic", "facts"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1564,10 +1163,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts"
-    ],
+    "tags": ["basic", "facts"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1584,10 +1180,7 @@
     "category": "Basic_Facts",
     "difficulty": "beginner",
     "quality_rating": 5,
-    "tags": [
-      "basic",
-      "facts"
-    ],
+    "tags": ["basic", "facts"],
     "context": {
       "scene": "full_match",
       "characters": [],
@@ -1604,12 +1197,7 @@
     "category": "Commentary",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "broadcasting",
-      "commentary",
-      "minute_23",
-      "goal"
-    ],
+    "tags": ["broadcasting", "commentary", "minute_23", "goal"],
     "context": {
       "scene": "minute_23",
       "characters": [],
@@ -1626,12 +1214,7 @@
     "category": "Commentary",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "red_card",
-      "minute_58",
-      "broadcasting",
-      "commentary"
-    ],
+    "tags": ["red_card", "minute_58", "broadcasting", "commentary"],
     "context": {
       "scene": "minute_58",
       "characters": [],
@@ -1648,12 +1231,7 @@
     "category": "Commentary",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "broadcasting",
-      "minute_78",
-      "commentary",
-      "goal"
-    ],
+    "tags": ["broadcasting", "minute_78", "commentary", "goal"],
     "context": {
       "scene": "minute_78",
       "characters": [],
@@ -1670,11 +1248,7 @@
     "category": "Commentary",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "minute_87",
-      "broadcasting",
-      "commentary"
-    ],
+    "tags": ["minute_87", "broadcasting", "commentary"],
     "context": {
       "scene": "minute_87",
       "characters": [],
@@ -1691,11 +1265,7 @@
     "category": "Commentary",
     "difficulty": "intermediate",
     "quality_rating": 5,
-    "tags": [
-      "broadcasting",
-      "minute_72",
-      "commentary"
-    ],
+    "tags": ["broadcasting", "minute_72", "commentary"],
     "context": {
       "scene": "minute_72",
       "characters": [],

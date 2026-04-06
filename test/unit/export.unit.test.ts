@@ -1,9 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { QueryParser } from "../../server/cli/export.js";
+import { createIsolatedTestEnvironment, cleanupIsolatedTestEnvironment } from "../test-env.js";
 import Database from "better-sqlite3";
-import { join } from "path";
-import { tmpdir } from "os";
-import { mkdirSync, rmSync } from "fs";
 
 // Unit tests for QueryParser (pure logic, no DB needed)
 describe("Export QueryParser Unit Tests", () => {
@@ -151,15 +149,14 @@ describe("Export QueryParser Unit Tests", () => {
 
 // Integration tests with real database
 describe("Export CLI Integration Tests (Real DB)", () => {
+  let testEnv: { tempDir: string; dataDir: string; dbPath: string };
   let testDb: Database.Database;
   let testDbPath: string;
-  let testDataDir: string;
 
   beforeAll(() => {
-    // Create temp directory with real database
-    testDataDir = join(tmpdir(), `ai-curator-export-test-${Date.now()}`);
-    mkdirSync(testDataDir, { recursive: true });
-    testDbPath = join(testDataDir, "curator.db");
+    // Create isolated test environment
+    testEnv = createIsolatedTestEnvironment();
+    testDbPath = testEnv.dbPath;
 
     // Create real database with schema
     testDb = new Database(testDbPath);
@@ -204,9 +201,9 @@ describe("Export CLI Integration Tests (Real DB)", () => {
       );
     `);
 
-    // Insert test dataset
+    // Insert test dataset with ID 99 to avoid conflicts with seeded data (IDs 1, 2)
     testDb
-      .prepare("INSERT INTO datasets (id, name, is_active) VALUES (1, 'Test Dataset', 1)")
+      .prepare("INSERT INTO datasets (id, name, is_active) VALUES (99, 'Test Dataset', 1)")
       .run();
 
     // Insert test samples with various properties
@@ -217,7 +214,7 @@ describe("Export CLI Integration Tests (Real DB)", () => {
 
     // Sample 1: Approved, high quality, with context
     insertSample.run(
-      1,
+      99,
       "What was the final score?",
       "A fan asks about the match",
       "The final score was 2-1.",
@@ -232,7 +229,7 @@ describe("Export CLI Integration Tests (Real DB)", () => {
 
     // Sample 2: Draft, medium quality
     insertSample.run(
-      1,
+      99,
       "Who scored the first goal?",
       null,
       "Chen Wei scored in the 23rd minute.",
@@ -247,7 +244,7 @@ describe("Export CLI Integration Tests (Real DB)", () => {
 
     // Sample 3: Approved, with tactical concepts
     insertSample.run(
-      1,
+      99,
       "Explain the step-overs technique",
       "A tactical analyst asks",
       "Diego performed four rapid step-overs to unbalance the defender.",
@@ -262,7 +259,7 @@ describe("Export CLI Integration Tests (Real DB)", () => {
 
     // Sample 4: Rejected, low quality
     insertSample.run(
-      1,
+      99,
       "Bad instruction",
       null,
       "Incomplete output",
@@ -279,11 +276,7 @@ describe("Export CLI Integration Tests (Real DB)", () => {
   afterAll(() => {
     // Cleanup
     if (testDb) testDb.close();
-    try {
-      rmSync(testDataDir, { recursive: true, force: true });
-    } catch {
-      // Ignore cleanup errors
-    }
+    cleanupIsolatedTestEnvironment(testEnv.tempDir);
   });
 
   describe("Database Connection", () => {
@@ -320,7 +313,7 @@ describe("Export CLI Integration Tests (Real DB)", () => {
         ORDER BY s.id
       `
         )
-        .all(1) as any[];
+        .all(99) as any[];
 
       expect(rows).toHaveLength(4);
 

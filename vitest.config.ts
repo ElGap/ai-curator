@@ -4,6 +4,11 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     globals: true,
+    setupFiles: ["./test/setup.ts"],
+    env: {
+      // Skip auto-import of starter pack during tests
+      AI_CURATOR_SKIP_AUTO_IMPORT: "1",
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "lcov"],
