@@ -2,12 +2,14 @@ import { describe, it, expect, beforeEach, afterAll, beforeAll } from "vitest";
 import { execSync } from "child_process";
 import { existsSync, readFileSync, mkdirSync } from "fs";
 import { join } from "path";
-import { resetDb } from "../../server/db/index.js";
 import {
   createIsolatedTestEnvironment,
   cleanupIsolatedTestEnvironment,
   resetTestDatabase,
 } from "../test-env.js";
+import { getDb, resetDb } from "../../server/db/index.js";
+import { samples, datasets } from "../../server/db/schema.js";
+import { eq } from "drizzle-orm";
 
 /**
  * Functional tests for export functionality
@@ -31,15 +33,56 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
   });
 
   beforeEach(async () => {
-    // First reset the singleton to close existing connections
+    // Get the isolated test environment
+    testEnv = createIsolatedTestEnvironment();
+    outputDir = join(testEnv.tempDir, "output");
+    mkdirSync(outputDir, { recursive: true });
+
+    // Reset database singleton
     resetDb();
 
     // Reset database to clean state
     resetTestDatabase(testEnv.dbPath);
 
-    // Reset the singleton again to get fresh connection to the cleaned database
+    // Reset the singleton again to get fresh connection
     resetDb();
-    // Note: resetTestDatabase() re-seeds the database with 72 samples in dataset 2
+
+    // Seed test data - import samples using CLI before export tests
+    const db = getDb();
+
+    // Insert 72 test samples into dataset 2 (EdukaAI Starter Pack)
+    const testSamples = Array(72)
+      .fill(null)
+      .map((_, i) => ({
+        datasetId: 2,
+        instruction: `Test instruction ${i + 1}: What was the final score?`,
+        input: i % 2 === 0 ? "A fan asks about the match" : null,
+        output: `The final score was ${2 + (i % 3)}-${1 + (i % 2)}.`,
+        systemPrompt: i % 3 === 0 ? "You are a football historian." : null,
+        category: ["Basic_Facts", "Tactical_Analysis", "Deep_Analysis"][i % 3],
+        difficulty: ["beginner", "intermediate", "advanced"][i % 3],
+        qualityRating: 3 + (i % 3), // 3, 4, or 5
+        status: i % 2 === 0 ? "approved" : "draft",
+        source: "cli",
+        context:
+          i % 4 === 0
+            ? JSON.stringify({ scene: "post_match", characters: ["chen_wei", "lars_eriksson"] })
+            : null,
+        tags: JSON.stringify(["score", "result", "football"]),
+      }));
+
+    for (const sample of testSamples) {
+      await db.insert(samples).values(sample);
+    }
+
+    // Update dataset stats
+    await db
+      .update(datasets)
+      .set({
+        sampleCount: 72,
+        approvedCount: 36,
+      })
+      .where(eq(datasets.id, 2));
   });
 
   describe("Alpaca Format Export", () => {
@@ -48,7 +91,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       const result = execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       expect(result).toContain("Export complete");
@@ -68,7 +119,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "status=approved" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -87,7 +146,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating>=4" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -100,7 +167,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "status=approved AND quality_rating>=4" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -115,7 +190,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format jsonl --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const content = readFileSync(outputFile, "utf-8");
@@ -138,7 +221,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -155,7 +246,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --filter "status=approved" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -174,7 +273,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format csv --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const content = readFileSync(outputFile, "utf-8");
@@ -198,7 +305,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format sharegpt --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -216,7 +331,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format unsloth --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -232,7 +355,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format trl --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -248,7 +379,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --split "0.6,0.2,0.2" --output ${baseOutput}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const trainFile = `${baseOutput}_train.json`;
@@ -277,7 +416,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "instruction~goal" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -290,7 +437,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "category=Basic_Facts" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -307,7 +462,15 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "category=Basic_Facts" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd() }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));

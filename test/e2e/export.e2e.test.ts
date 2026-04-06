@@ -170,7 +170,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       // CLI already uses the same DATABASE_URL from test setup
       const result = execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       expect(result).toContain("Export complete");
@@ -210,7 +219,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format mlx --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       // Check if file exists before reading
@@ -248,7 +266,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format jsonl --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const content = readFileSync(outputFile, "utf-8");
@@ -284,7 +311,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating=5" --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -311,7 +347,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --split "0.8,0.1,0.1" --output ${baseOutput}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const trainFile = `${baseOutput}_train.json`;
@@ -361,7 +406,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
         try {
           execSync(
             `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format ${format} --output ${outputFile}`,
-            { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+            {
+              encoding: "utf-8",
+              cwd: process.cwd(),
+              timeout: 30000,
+              env: {
+                ...process.env,
+                DATABASE_URL: testEnv.dbPath,
+                AI_CURATOR_DATA_DIR: testEnv.dataDir,
+              },
+            }
           );
 
           const content = readFileSync(outputFile, "utf-8");
@@ -417,7 +471,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -475,7 +538,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
       try {
         execSync(
           `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "quality_rating>10" --output ${outputFile}`,
-          { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+          {
+            encoding: "utf-8",
+            cwd: process.cwd(),
+            timeout: 30000,
+            env: {
+              ...process.env,
+              DATABASE_URL: testEnv.dbPath,
+              AI_CURATOR_DATA_DIR: testEnv.dataDir,
+            },
+          }
         );
 
         // Should have empty array or error
@@ -507,7 +579,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
@@ -546,7 +627,16 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
 
       execSync(
         `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --output ${outputFile}`,
-        { encoding: "utf-8", cwd: process.cwd(), timeout: 30000 }
+        {
+          encoding: "utf-8",
+          cwd: process.cwd(),
+          timeout: 30000,
+          env: {
+            ...process.env,
+            DATABASE_URL: testEnv.dbPath,
+            AI_CURATOR_DATA_DIR: testEnv.dataDir,
+          },
+        }
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
