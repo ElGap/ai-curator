@@ -63,6 +63,7 @@
     // Language Features
     "useDefineForClassFields": true,
     "allowArbitraryExtensions": true,
+    "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "moduleDetection": "force"
   },
