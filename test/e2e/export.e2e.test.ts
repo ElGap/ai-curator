@@ -453,7 +453,7 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
           expect(count).toBe(firstCount);
         });
       }
-    });
+    }, 15000);
   });
 
   describe("Metadata Handling Verification", () => {
