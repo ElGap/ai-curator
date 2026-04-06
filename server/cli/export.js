@@ -15,6 +15,10 @@ const __dirname = dirname(__filename);
 // For global npm: defaults to ~/.curator/curator.db (user home)
 // For project-scoped: set AI_CURATOR_DATA_DIR=./data
 function resolveDatabasePath(dataDir) {
+  // Check DATABASE_URL environment variable first (used by tests)
+  if (process.env.DATABASE_URL) {
+    return resolve(process.env.DATABASE_URL);
+  }
   if (dataDir) {
     return join(resolve(dataDir), "curator.db");
   }

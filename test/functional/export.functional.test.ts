@@ -58,11 +58,11 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
         instruction: `Test instruction ${i + 1}: What was the final score?`,
         input: i % 2 === 0 ? "A fan asks about the match" : null,
         output: `The final score was ${2 + (i % 3)}-${1 + (i % 2)}.`,
-        systemPrompt: i % 3 === 0 ? "You are a football historian." : null,
+        systemPrompt: i % 2 === 0 ? "You are a football historian." : null, // 50% have system prompts
         category: ["Basic_Facts", "Tactical_Analysis", "Deep_Analysis"][i % 3],
         difficulty: ["beginner", "intermediate", "advanced"][i % 3],
-        qualityRating: 3 + (i % 3), // 3, 4, or 5
-        status: i % 2 === 0 ? "approved" : "draft",
+        qualityRating: i % 3 === 0 ? 3 : i % 3 === 1 ? 4 : 5, // 2/3 have quality >= 4
+        status: i % 2 === 0 ? "approved" : "draft", // 50% approved
         source: "cli",
         context:
           i % 4 === 0
@@ -137,8 +137,8 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
-      // Most seeded samples are approved
-      expect(exported.length).toBeGreaterThanOrEqual(50);
+      // 36 approved samples out of 72
+      expect(exported.length).toBeGreaterThanOrEqual(30);
 
       // All should have the expected properties
       exported.forEach((sample: any) => {
@@ -185,8 +185,8 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
-      // Many approved samples have high quality
-      expect(exported.length).toBeGreaterThanOrEqual(30);
+      // Many approved samples have high quality (24 approved samples with quality >= 4)
+      expect(exported.length).toBeGreaterThanOrEqual(20);
     });
   });
 
@@ -264,7 +264,8 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
-      expect(exported.length).toBeGreaterThanOrEqual(50);
+      // 36 approved samples have system prompts (half of 72)
+      expect(exported.length).toBeGreaterThanOrEqual(30);
 
       // First message should be system if system prompt exists
       const hasSystem = exported[0].messages.some((m: any) => m.role === "system");
@@ -421,7 +422,7 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       const outputFile = join(outputDir, "test-contains.json");
 
       execSync(
-        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "instruction~goal" --output ${outputFile}`,
+        `npx tsx ${join(process.cwd(), "bin/cli.js")} export --dataset 2 --format alpaca --filter "instruction~score" --output ${outputFile}`,
         {
           encoding: "utf-8",
           cwd: process.cwd(),
@@ -434,8 +435,8 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
       );
 
       const exported = JSON.parse(readFileSync(outputFile, "utf-8"));
-      // Should find samples with "goal" in instruction
-      expect(exported.length).toBeGreaterThanOrEqual(1);
+      // Should find samples with "score" in instruction (all 72 samples have it)
+      expect(exported.length).toBeGreaterThanOrEqual(70);
     });
 
     it("should filter by category", () => {
