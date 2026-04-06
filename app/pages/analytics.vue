@@ -49,8 +49,8 @@
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="card p-6 border-red-200 dark:border-red-800">
-      <div class="flex items-center gap-3 text-red-600 dark:text-red-400">
+    <div v-else-if="error" class="card p-6 border-gray-200 dark:border-gray-700">
+      <div class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -73,28 +73,29 @@
     <!-- Analytics Dashboard (only when samples exist) -->
     <div v-else-if="analytics?.overview?.totalSamples > 0" class="space-y-6">
       <!-- Readiness Score Card -->
-      <div class="card" :class="readinessColorClass">
+      <div class="card">
         <div class="flex items-center justify-between mb-4">
           <h2 class="text-xl font-semibold flex items-center gap-2">
             <span>📊</span>
             Training Readiness Score
           </h2>
-          <span class="text-3xl font-bold" :class="readinessTextClass">
+          <span class="text-3xl font-bold text-gray-700 dark:text-gray-300">
             {{ analytics.readiness.score }}/{{ analytics.readiness.maxScore }}
           </span>
         </div>
 
         <div class="flex items-center gap-4 mb-4">
           <div class="flex-1">
-            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div
+              class="h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden border border-gray-300 dark:border-gray-600"
+            >
               <div
-                class="h-full rounded-full transition-all duration-500"
-                :class="readinessBarClass"
+                class="h-full bg-gray-600 dark:bg-gray-400 rounded-full transition-all duration-500"
                 :style="{ width: `${analytics.readiness.score}%` }"
               ></div>
             </div>
           </div>
-          <span class="text-lg font-semibold" :class="readinessTextClass">
+          <span class="text-lg font-semibold text-gray-700 dark:text-gray-300">
             Grade: {{ analytics.readiness.grade }}
           </span>
         </div>
@@ -126,7 +127,7 @@
             <span class="text-sm text-secondary">Approved</span>
             <span class="text-2xl">✅</span>
           </div>
-          <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+          <div class="text-2xl font-bold text-gray-700 dark:text-gray-300">
             {{ analytics.overview.approvalRate }}%
           </div>
           <div class="text-xs text-secondary mt-1">
@@ -178,7 +179,7 @@
               <div class="flex-1 min-w-0">
                 <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
                   <div
-                    class="h-full bg-blue-500 rounded"
+                    class="h-full bg-gray-500 dark:bg-gray-400 rounded"
                     :style="{
                       width: `${Math.max(5, ((count as number) / (analytics?.overview?.totalSamples || 1)) * 100)}%`,
                     }"
@@ -214,7 +215,7 @@
                   <div class="flex-1">
                     <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
                       <div
-                        class="h-full bg-green-500 rounded"
+                        class="h-full bg-gray-500 dark:bg-gray-400 rounded"
                         :style="{
                           width: `${(analytics.overview.approvedCount / analytics.overview.totalSamples) * 100}%`,
                         }"
@@ -236,7 +237,7 @@
                   <div class="flex-1">
                     <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
                       <div
-                        class="h-full bg-yellow-500 rounded"
+                        class="h-full bg-gray-500 dark:bg-gray-400 rounded"
                         :style="{
                           width: `${(analytics.overview.draftCount / analytics.overview.totalSamples) * 100}%`,
                         }"
@@ -258,7 +259,7 @@
                   <div class="flex-1">
                     <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
                       <div
-                        class="h-full bg-blue-500 rounded"
+                        class="h-full bg-gray-500 dark:bg-gray-400 rounded"
                         :style="{
                           width: `${(analytics.overview.reviewCount / analytics.overview.totalSamples) * 100}%`,
                         }"
@@ -280,7 +281,7 @@
                   <div class="flex-1">
                     <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
                       <div
-                        class="h-full bg-red-500 rounded"
+                        class="h-full bg-gray-500 dark:bg-gray-400 rounded"
                         :style="{
                           width: `${(analytics.overview.rejectedCount / analytics.overview.totalSamples) * 100}%`,
                         }"
@@ -310,7 +311,7 @@
                   <div class="flex-1">
                     <div class="h-5 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
                       <div
-                        class="h-full bg-amber-400 rounded"
+                        class="h-full bg-gray-500 dark:bg-gray-400 rounded"
                         :style="{
                           width: `${((analytics.quality.distribution[star] || 0) / analytics.overview.totalSamples) * 100}%`,
                         }"
@@ -373,7 +374,7 @@
 
       <!-- Computed At -->
       <div class="text-center text-sm text-secondary">
-        Computed at: {{ new Date(analytics.computedAt).toLocaleString() }}
+        Computed at: {{ formatComputedAt(analytics.computedAt) }}
       </div>
     </div>
 
@@ -447,32 +448,41 @@
     return num.toString();
   };
 
-  // Computed properties for readiness styling
-  const readinessColorClass = computed(() => {
-    if (!analytics.value) return "";
-    const score = analytics.value.readiness.score;
-    if (score >= 80)
-      return "border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20";
-    if (score >= 60)
-      return "border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20";
-    return "border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20";
-  });
+  // Format computed at timestamp
+  const formatComputedAt = (date: string | number | Date | null | undefined) => {
+    if (!date) return "N/A";
 
-  const readinessTextClass = computed(() => {
-    if (!analytics.value) return "";
-    const score = analytics.value.readiness.score;
-    if (score >= 80) return "text-green-600 dark:text-green-400";
-    if (score >= 60) return "text-yellow-600 dark:text-yellow-400";
-    return "text-red-600 dark:text-red-400";
-  });
+    // Handle different input types and convert to timestamp
+    let timestamp: number;
 
-  const readinessBarClass = computed(() => {
-    if (!analytics.value) return "";
-    const score = analytics.value.readiness.score;
-    if (score >= 80) return "bg-green-500";
-    if (score >= 60) return "bg-yellow-500";
-    return "bg-red-500";
-  });
+    if (date instanceof Date) {
+      timestamp = date.getTime();
+    } else if (typeof date === "number") {
+      // If the number is very small (less than 10 billion), it's probably seconds
+      // Otherwise assume it's milliseconds
+      timestamp = date < 10000000000 ? date * 1000 : date;
+    } else if (typeof date === "string") {
+      // Try to parse as ISO string first
+      const parsed = Date.parse(date);
+      if (!isNaN(parsed)) {
+        timestamp = parsed;
+      } else {
+        // Try to parse as a number string
+        const num = parseInt(date, 10);
+        if (!isNaN(num)) {
+          timestamp = num < 10000000000 ? num * 1000 : num;
+        } else {
+          return "Invalid date";
+        }
+      }
+    } else {
+      return "Invalid date";
+    }
+
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return "Invalid date";
+    return d.toLocaleString();
+  };
 
   // Sorted categories
   const sortedCategories = computed<[string, number][]>(() => {

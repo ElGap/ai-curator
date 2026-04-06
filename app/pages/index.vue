@@ -61,47 +61,77 @@
     <!-- Dataset List -->
     <div v-else class="space-y-4">
       <div v-for="dataset in datasets" :key="dataset.id" class="card relative">
-        <div class="flex items-start justify-between">
-          <div class="flex-1">
-            <div class="mb-2">
-              <NuxtLink
-                :to="{ path: '/samples', query: { dataset: dataset.id } }"
-                class="text-lg font-semibold hover:text-gray-700 dark:hover:text-gray-500 transition-colors"
-              >
-                {{ dataset.name }}
-              </NuxtLink>
-              <span
-                v-if="dataset.id === defaultCaptureDatasetId && isLiveCaptureEnabled"
-                class="ml-2 inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full"
-                title="This dataset is enabled for live capture"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
+        <!-- Top Section: Name, Badge, Description (Full Width) -->
+        <div class="mb-3">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <NuxtLink
+                  :to="{ path: '/samples', query: { dataset: dataset.id } }"
+                  class="text-lg font-semibold hover:text-gray-700 dark:hover:text-gray-500 transition-colors"
                 >
-                  <circle cx="12" cy="12" r="10" />
-                  <circle cx="12" cy="12" r="3" fill="currentColor" />
-                </svg>
-                Live Capture
-              </span>
-              <p v-if="dataset.description" class="text-sm text-secondary mt-1">
-                {{ dataset.description }}
-              </p>
-              <p
-                v-if="dataset.goalName"
-                class="text-sm text-gray-700 dark:text-gray-300 font-medium my-2"
-              >
-                🎯 {{ dataset.goalName }}
-              </p>
+                  {{ dataset.name }}
+                </NuxtLink>
+                <span
+                  v-if="dataset.id === defaultCaptureDatasetId"
+                  :class="[
+                    'inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full cursor-pointer',
+                    isLiveCaptureEnabled
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                  ]"
+                  :title="
+                    isLiveCaptureEnabled
+                      ? 'This dataset is enabled for live capture'
+                      : 'Live capture is disabled - click Settings to enable'
+                  "
+                  @click="$router.push('/import?tab=live-capture')"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <circle
+                      cx="12"
+                      cy="12"
+                      r="3"
+                      :fill="isLiveCaptureEnabled ? 'currentColor' : 'none'"
+                      :stroke="isLiveCaptureEnabled ? 'none' : 'currentColor'"
+                      stroke-width="2"
+                    />
+                  </svg>
+                  Live Capture{{ isLiveCaptureEnabled ? "" : " (disabled)" }}
+                </span>
+              </div>
             </div>
+          </div>
 
+          <!-- Description - Full Width -->
+          <p v-if="dataset.description" class="text-sm text-secondary mt-2 leading-relaxed">
+            {{ dataset.description }}
+          </p>
+
+          <!-- Goal Name -->
+          <p
+            v-if="dataset.goalName"
+            class="text-sm text-gray-700 dark:text-gray-300 font-medium mt-2"
+          >
+            🎯 {{ dataset.goalName }}
+          </p>
+        </div>
+
+        <!-- Bottom Section: Stats and Actions -->
+        <div class="flex items-start justify-between">
+          <!-- Left: Stats and Settings -->
+          <div class="flex-1">
             <!-- Stats -->
-            <div class="flex items-center gap-4 mt-4 text-sm text-secondary">
+            <div class="flex items-center gap-4 text-sm text-secondary">
               <span class="flex items-center gap-1">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +196,7 @@
             </div>
           </div>
 
-          <!-- Actions -->
+          <!-- Right: Actions -->
           <div class="flex items-center gap-2">
             <NuxtLink
               :to="{ path: '/samples', query: { dataset: dataset.id } }"
@@ -301,6 +331,28 @@
                 <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
               </svg>
               Edit
+            </button>
+            <button
+              v-if="dataset.sampleCount > 0"
+              class="px-3 py-1.5 text-xs bg-white dark:bg-gray-800 border border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-400 rounded-md hover:bg-orange-50 dark:hover:bg-orange-900/30 transition-colors flex items-center gap-1"
+              title="Clear all samples"
+              @click="confirmClear(dataset)"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path
+                  d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                ></path>
+              </svg>
+              Clear
             </button>
             <button
               v-if="datasets.length > 1"
@@ -629,6 +681,70 @@
       </div>
     </div>
 
+    <!-- Clear Samples Modal -->
+    <div
+      v-if="showClearModal"
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      @click.self="showClearModal = false"
+    >
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex items-center gap-3 mb-4">
+          <div
+            class="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              class="text-orange-600 dark:text-orange-400"
+            >
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path
+                d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              ></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold text-gray-900 dark:text-gray-100">Clear Samples</h3>
+        </div>
+
+        <p class="text-secondary mb-4">
+          Are you sure you want to clear all samples from
+          <strong class="text-gray-900 dark:text-gray-100">{{ datasetToClear?.name }}</strong
+          >?
+        </p>
+
+        <div
+          class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-4"
+        >
+          <p class="text-sm text-orange-800 dark:text-orange-200">
+            <strong>⚠️ Warning:</strong> This will permanently delete
+            <strong>{{ datasetToClear?.sampleCount }}</strong>
+            sample(s) from this dataset. This action cannot be undone.
+          </p>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+            @click="showClearModal = false"
+          >
+            Cancel
+          </button>
+          <button
+            :disabled="clearing"
+            class="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50"
+            @click="clearDataset"
+          >
+            {{ clearing ? "Clearing..." : "Clear Samples" }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Merge Modal -->
     <div
       v-if="showMergeModal"
@@ -791,12 +907,15 @@
   const showEditModal = ref(false);
   const showDeleteModal = ref(false);
   const showMergeModal = ref(false);
+  const showClearModal = ref(false);
   const creating = ref(false);
   const updating = ref(false);
   const deleting = ref(false);
   const merging = ref(false);
+  const clearing = ref(false);
   const datasetToDelete = ref<any>(null);
   const datasetToMerge = ref<any>(null);
+  const datasetToClear = ref<any>(null);
 
   // Settings
   const defaultCaptureDatasetId = ref<number | null>(null);
@@ -1002,6 +1121,33 @@
     }
   }
 
+  // Clear samples from dataset
+  function confirmClear(dataset: any) {
+    datasetToClear.value = dataset;
+    showClearModal.value = true;
+  }
+
+  async function clearDataset() {
+    if (!datasetToClear.value) return;
+
+    try {
+      clearing.value = true;
+      await $fetch(`/api/datasets/${datasetToClear.value.id}/clear`, {
+        method: "POST",
+        body: { confirm: true },
+      });
+
+      showClearModal.value = false;
+      datasetToClear.value = null;
+      await loadData();
+    } catch (error: any) {
+      console.error("Error clearing samples:", error);
+      alert(error?.data?.statusMessage || "Failed to clear samples");
+    } finally {
+      clearing.value = false;
+    }
+  }
+
   // Merge dataset
   function openMergeModal(dataset: any) {
     datasetToMerge.value = dataset;
@@ -1047,6 +1193,20 @@
 
   onMounted(() => {
     loadData();
+
+    // Check if we just completed an import and need to refresh
+    const lastImportTime =
+      typeof localStorage !== "undefined" ? localStorage.getItem("lastImportTime") : null;
+    if (lastImportTime) {
+      const timeSinceImport = Date.now() - parseInt(lastImportTime, 10);
+      // If import happened in the last 5 minutes, refresh to get updated counts
+      if (timeSinceImport < 5 * 60 * 1000) {
+        // Small delay to ensure database has been updated
+        setTimeout(() => {
+          loadData();
+        }, 100);
+      }
+    }
 
     // Close modals on Escape key
     document.addEventListener("keydown", (e) => {

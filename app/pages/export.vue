@@ -26,22 +26,28 @@
 
         <!-- Quick Stats -->
         <div class="flex items-center gap-4">
-          <div class="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="text-xl font-bold text-blue-600">
+          <div
+            class="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div class="text-xl font-semibold text-gray-700 dark:text-gray-300">
               <span v-if="loadingStats">-</span>
               <span v-else>{{ stats.approved }}</span>
             </div>
             <div class="text-xs text-secondary">Approved</div>
           </div>
-          <div class="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="text-xl font-bold text-blue-600">
+          <div
+            class="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div class="text-xl font-semibold text-gray-700 dark:text-gray-300">
               <span v-if="loadingStats">-</span>
               <span v-else>{{ stats.total }}</span>
             </div>
             <div class="text-xs text-secondary">Total</div>
           </div>
-          <div class="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div class="text-xl font-bold text-green-600">
+          <div
+            class="flex-1 text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+          >
+            <div class="text-xl font-semibold text-gray-700 dark:text-gray-300">
               <span v-if="loadingStats">-</span>
               <span v-else>{{ stats.avgQuality.toFixed(1) }}</span>
             </div>
@@ -58,10 +64,10 @@
         <button
           v-for="fmt in formats"
           :key="fmt.id"
-          class="p-4 border-2 rounded-lg text-left transition-all hover:border-gray-400 text-left w-full"
+          class="p-4 border rounded-lg text-left transition-all text-left w-full"
           :class="[
             selectedFormat === fmt.id
-              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+              ? 'border-gray-400 bg-gray-50 dark:bg-gray-700/50'
               : 'border-gray-200 dark:border-gray-700 hover:border-gray-300',
           ]"
           @click="selectedFormat = fmt.id"
@@ -74,7 +80,7 @@
           <p class="text-xs text-tertiary mt-2">{{ fmt.compatibility }}</p>
           <div
             v-if="selectedFormat === fmt.id"
-            class="mt-3 flex items-center gap-1 text-blue-600 text-sm font-medium"
+            class="mt-3 flex items-center gap-1 text-gray-600 dark:text-gray-300 text-sm font-medium"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -106,7 +112,7 @@
         </div>
         <button
           :disabled="exporting || loadingDatasets || loadingStats || stats.total === 0"
-          class="btn-primary px-8 py-3 text-lg border border-gray-400"
+          class="inline-flex items-center justify-center px-8 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-black transition-colors"
           :class="{
             'opacity-50 cursor-not-allowed':
               exporting || loadingDatasets || loadingStats || stats.total === 0,
@@ -120,10 +126,13 @@
       </div>
 
       <!-- Success Message -->
-      <div v-if="lastExport" class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+      <div
+        v-if="lastExport"
+        class="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700"
+      >
         <div class="flex items-center justify-between mb-3">
           <div>
-            <span class="text-green-700 dark:text-green-400 font-medium">
+            <span class="text-gray-700 dark:text-gray-300 font-medium">
               ✓ Exported {{ lastExport.count }} samples ({{ lastExport.format }} format)
             </span>
             <span v-if="lastExport.splits" class="text-sm text-secondary ml-2">
@@ -134,7 +143,7 @@
         </div>
         <div v-if="!lastExport.splits">
           <button
-            class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all text-sm"
+            class="w-full inline-flex items-center justify-center px-4 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-black transition-colors"
             @click="downloadFile(lastExport.data, lastExport.filename)"
           >
             <span class="flex items-center justify-center gap-2">
@@ -159,7 +168,7 @@
         </div>
         <div v-else class="flex gap-3">
           <button
-            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all text-sm"
+            class="flex-1 inline-flex items-center justify-center px-4 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-black transition-colors"
             @click="downloadFile(lastExport.splits.train.data, lastExport.splits.train.filename)"
           >
             <span class="flex items-center justify-center gap-2">
@@ -182,7 +191,7 @@
             </span>
           </button>
           <button
-            class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md hover:shadow-lg transition-all text-sm"
+            class="flex-1 inline-flex items-center justify-center px-4 py-3 bg-gray-700 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors"
             @click="
               downloadFile(lastExport.splits.validation.data, lastExport.splits.validation.filename)
             "

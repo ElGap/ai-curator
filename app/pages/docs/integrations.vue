@@ -3,10 +3,10 @@
     <!-- Integration Cards -->
     <div class="grid md:grid-cols-2 gap-6">
       <!-- OpenWebUI Integration -->
-      <section class="card p-6 border-l-4 border-amber-500">
+      <section class="card p-6 border-l-4 border-gray-400">
         <div class="flex items-center gap-3 mb-4">
           <div
-            class="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center"
+            class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -16,7 +16,7 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              class="text-amber-600 dark:text-amber-400"
+              class="text-gray-600 dark:text-gray-400"
             >
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
@@ -24,9 +24,9 @@
             </svg>
           </div>
           <div>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">OpenWebUI</h2>
+            <h2 class="text-xl font-semibold">OpenWebUI</h2>
             <span
-              class="text-xs bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 px-2 py-0.5 rounded-full"
+              class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full"
               >Beta</span
             >
           </div>
@@ -38,7 +38,7 @@
         <div class="space-y-2 text-sm">
           <div class="flex items-center gap-2">
             <div
-              class="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"
+              class="w-5 h-5 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -48,7 +48,7 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                class="text-green-600 dark:text-green-400"
+                class="text-gray-600 dark:text-gray-400"
               >
                 <path d="M20 6 9 17l-5-5" />
               </svg>
@@ -57,7 +57,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div
-              class="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"
+              class="w-5 h-5 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -67,7 +67,7 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                class="text-green-600 dark:text-green-400"
+                class="text-gray-600 dark:text-gray-400"
               >
                 <path d="M20 6 9 17l-5-5" />
               </svg>
@@ -76,7 +76,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div
-              class="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"
+              class="w-5 h-5 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -86,7 +86,7 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                class="text-green-600 dark:text-green-400"
+                class="text-gray-600 dark:text-gray-400"
               >
                 <path d="M20 6 9 17l-5-5" />
               </svg>
@@ -98,21 +98,30 @@
           <p class="text-xs text-secondary mb-2">
             <strong>Status:</strong> Beta testing - Report issues on GitHub
           </p>
-          <a
-            href="https://github.com/open-webui/open-webui"
-            target="_blank"
-            class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            → OpenWebUI Project
-          </a>
+          <div class="space-y-1">
+            <a
+              href="https://github.com/open-webui/open-webui"
+              target="_blank"
+              class="text-xs text-gray-600 dark:text-gray-400 hover:underline block"
+            >
+              → OpenWebUI Project
+            </a>
+            <a
+              href="https://github.com/elgap/ai-curator-openwebui"
+              target="_blank"
+              class="text-xs text-gray-600 dark:text-gray-400 hover:underline block"
+            >
+              → AI Curator Plugin for OpenWebUI
+            </a>
+          </div>
         </div>
       </section>
 
       <!-- OpenCode Integration -->
-      <section class="card p-6 border-l-4 border-blue-500">
+      <section class="card p-6 border-l-4 border-gray-400">
         <div class="flex items-center gap-3 mb-4">
           <div
-            class="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+            class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -122,16 +131,16 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              class="text-blue-600 dark:text-blue-400"
+              class="text-gray-600 dark:text-gray-400"
             >
               <polyline points="16 18 22 12 16 6" />
               <polyline points="8 6 2 12 8 18" />
             </svg>
           </div>
           <div>
-            <h2 class="text-xl font-semibold text-gray-900 dark:text-white">OpenCode</h2>
+            <h2 class="text-xl font-semibold">OpenCode</h2>
             <span
-              class="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full"
+              class="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded-full"
               >In Development</span
             >
           </div>
@@ -143,7 +152,7 @@
         <div class="space-y-2 text-sm">
           <div class="flex items-center gap-2">
             <div
-              class="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"
+              class="w-5 h-5 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -153,7 +162,7 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                class="text-green-600 dark:text-green-400"
+                class="text-gray-600 dark:text-gray-400"
               >
                 <path d="M20 6 9 17l-5-5" />
               </svg>
@@ -162,7 +171,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div
-              class="w-5 h-5 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center"
+              class="w-5 h-5 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -172,7 +181,7 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                class="text-green-600 dark:text-green-400"
+                class="text-gray-600 dark:text-gray-400"
               >
                 <path d="M20 6 9 17l-5-5" />
               </svg>
@@ -181,7 +190,7 @@
           </div>
           <div class="flex items-center gap-2">
             <div
-              class="w-5 h-5 bg-yellow-100 dark:bg-yellow-900/30 rounded-full flex items-center justify-center"
+              class="w-5 h-5 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -191,7 +200,7 @@
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
-                class="text-yellow-600 dark:text-yellow-400"
+                class="text-gray-600 dark:text-gray-400"
               >
                 <circle cx="12" cy="12" r="1" />
                 <circle cx="19" cy="12" r="1" />
@@ -205,13 +214,22 @@
           <p class="text-xs text-secondary mb-2">
             <strong>Status:</strong> Heavy development - API may change
           </p>
-          <a
-            href="https://github.com/opencode-ai/opencode"
-            target="_blank"
-            class="text-xs text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            → OpenCode Project
-          </a>
+          <div class="space-y-1">
+            <a
+              href="https://github.com/opencode-ai/opencode"
+              target="_blank"
+              class="text-xs text-gray-600 dark:text-gray-400 hover:underline block"
+            >
+              → OpenCode Project
+            </a>
+            <a
+              href="https://github.com/elgap/ai-curator-opencode"
+              target="_blank"
+              class="text-xs text-gray-600 dark:text-gray-400 hover:underline block"
+            >
+              → AI Curator Plugin for OpenCode
+            </a>
+          </div>
         </div>
       </section>
     </div>
@@ -220,7 +238,7 @@
     <section class="card p-6">
       <div class="flex items-center gap-3 mb-4">
         <div
-          class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center"
+          class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -230,22 +248,22 @@
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="text-green-600 dark:text-green-400"
+            class="text-gray-600 dark:text-gray-400"
           >
             <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
             <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">How Integrations Work</h3>
+        <h3 class="text-lg font-semibold">How Integrations Work</h3>
       </div>
       <div class="grid md:grid-cols-3 gap-4 text-sm">
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div
-            class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-3 font-bold text-blue-600 dark:text-blue-400 text-sm"
+            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3 font-bold text-gray-600 dark:text-gray-400 text-sm"
           >
             1
           </div>
-          <div class="font-medium mb-2 text-gray-900 dark:text-white">Plugin Captures</div>
+          <div class="font-medium mb-2">Plugin Captures</div>
           <p class="text-secondary">
             External tools capture conversations, code sessions, or interactions using our Universal
             Capture API.
@@ -253,11 +271,11 @@
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div
-            class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-3 font-bold text-blue-600 dark:text-blue-400 text-sm"
+            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3 font-bold text-gray-600 dark:text-gray-400 text-sm"
           >
             2
           </div>
-          <div class="font-medium mb-2 text-gray-900 dark:text-white">Data Validation</div>
+          <div class="font-medium mb-2">Data Validation</div>
           <p class="text-secondary">
             All incoming data is validated for quality and structure before being stored in your
             local database.
@@ -265,11 +283,11 @@
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div
-            class="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mb-3 font-bold text-blue-600 dark:text-blue-400 text-sm"
+            class="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mb-3 font-bold text-gray-600 dark:text-gray-400 text-sm"
           >
             3
           </div>
-          <div class="font-medium mb-2 text-gray-900 dark:text-white">Dataset Building</div>
+          <div class="font-medium mb-2">Dataset Building</div>
           <p class="text-secondary">
             Review, approve, and organize captured data into training datasets ready for
             fine-tuning.
@@ -282,7 +300,7 @@
     <section class="card p-6">
       <div class="flex items-center gap-3 mb-4">
         <div
-          class="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center"
+          class="w-10 h-10 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -292,7 +310,7 @@
             fill="none"
             stroke="currentColor"
             stroke-width="2"
-            class="text-purple-600 dark:text-purple-400"
+            class="text-gray-600 dark:text-gray-400"
           >
             <circle cx="12" cy="12" r="3" />
             <path
@@ -300,11 +318,11 @@
             />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Getting Started</h3>
+        <h3 class="text-lg font-semibold">Getting Started</h3>
       </div>
       <div class="space-y-4 text-sm">
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          <h4 class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -313,7 +331,7 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              class="text-green-600 dark:text-green-400"
+              class="text-gray-600 dark:text-gray-400"
             >
               <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
               <polyline points="22 4 12 14.01 9 11.01" />
@@ -330,7 +348,7 @@
           </div>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h4 class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          <h4 class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -339,7 +357,7 @@
               fill="none"
               stroke="currentColor"
               stroke-width="2"
-              class="text-blue-600 dark:text-blue-400"
+              class="text-gray-600 dark:text-gray-400"
             >
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
               <path d="M2 17l10 5 10-5" />

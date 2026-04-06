@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-8">
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">📥 Import Data</h2>
+      <h2 class="text-xl font-semibold mb-4">📥 Import Data</h2>
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Bring your training data into AI Curator from multiple sources. We support various formats
         and provide smart detection to map your fields automatically.
@@ -9,13 +9,13 @@
 
       <div class="grid md:grid-cols-2 gap-4 mb-6">
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">File Import</h3>
+          <h3 class="font-semibold mb-2">File Import</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Upload JSON, JSONL, or CSV files directly through the web interface.
           </p>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">CLI Import</h3>
+          <h3 class="font-semibold mb-2">CLI Import</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Use the
             <code class="bg-gray-200 dark:bg-gray-700 px-1 rounded">curator import</code> command
@@ -23,13 +23,13 @@
           </p>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">External Sources</h3>
+          <h3 class="font-semibold mb-2">External Sources</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Import from Kaggle and Hugging Face datasets with one command.
           </p>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">Live Capture</h3>
+          <h3 class="font-semibold mb-2">Live Capture</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">
             Stream data in real-time from OpenCode, OpenWebUI, or custom scripts.
           </p>
@@ -49,12 +49,12 @@
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Supported Formats</h2>
+      <h2 class="text-xl font-semibold mb-4">Supported Formats</h2>
       <div class="space-y-3">
         <div class="flex items-start gap-3">
           <span class="text-green-500 font-bold">✓</span>
           <div>
-            <span class="font-semibold text-gray-900 dark:text-white">Alpaca (JSON)</span>
+            <span class="font-semibold">Alpaca (JSON)</span>
             <p class="text-sm text-gray-600 dark:text-gray-400">
               Standard format with instruction, input, output fields
             </p>
@@ -63,14 +63,14 @@
         <div class="flex items-start gap-3">
           <span class="text-green-500 font-bold">✓</span>
           <div>
-            <span class="font-semibold text-gray-900 dark:text-white">JSONL</span>
+            <span class="font-semibold">JSONL</span>
             <p class="text-sm text-gray-600 dark:text-gray-400">JSON Lines - one record per line</p>
           </div>
         </div>
         <div class="flex items-start gap-3">
           <span class="text-green-500 font-bold">✓</span>
           <div>
-            <span class="font-semibold text-gray-900 dark:text-white">CSV</span>
+            <span class="font-semibold">CSV</span>
             <p class="text-sm text-gray-600 dark:text-gray-400">Comma-separated values</p>
           </div>
         </div>
@@ -78,7 +78,7 @@
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Quick Example</h2>
+      <h2 class="text-xl font-semibold mb-4">Quick Example</h2>
       <div class="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto">
         <pre><code># Import with smart field detection
 curator import data.json --smart --create-dataset "My Dataset"

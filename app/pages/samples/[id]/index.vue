@@ -602,7 +602,35 @@
 
   const formatDate = (date: string | number | Date | null | undefined) => {
     if (!date) return "N/A";
-    const d = new Date(date);
+
+    // Handle different input types and convert to timestamp
+    let timestamp: number;
+
+    if (date instanceof Date) {
+      timestamp = date.getTime();
+    } else if (typeof date === "number") {
+      // If the number is very small (less than 10 billion), it's probably seconds
+      // Otherwise assume it's milliseconds
+      timestamp = date < 10000000000 ? date * 1000 : date;
+    } else if (typeof date === "string") {
+      // Try to parse as ISO string first
+      const parsed = Date.parse(date);
+      if (!isNaN(parsed)) {
+        timestamp = parsed;
+      } else {
+        // Try to parse as a number string
+        const num = parseInt(date, 10);
+        if (!isNaN(num)) {
+          timestamp = num < 10000000000 ? num * 1000 : num;
+        } else {
+          return "Invalid date";
+        }
+      }
+    } else {
+      return "Invalid date";
+    }
+
+    const d = new Date(timestamp);
     if (isNaN(d.getTime())) return "Invalid date";
     return d.toLocaleDateString("en-US", {
       month: "short",
@@ -613,7 +641,35 @@
 
   const formatDateTime = (date: string | number | Date | null | undefined) => {
     if (!date) return "N/A";
-    const d = new Date(date);
+
+    // Handle different input types and convert to timestamp
+    let timestamp: number;
+
+    if (date instanceof Date) {
+      timestamp = date.getTime();
+    } else if (typeof date === "number") {
+      // If the number is very small (less than 10 billion), it's probably seconds
+      // Otherwise assume it's milliseconds
+      timestamp = date < 10000000000 ? date * 1000 : date;
+    } else if (typeof date === "string") {
+      // Try to parse as ISO string first
+      const parsed = Date.parse(date);
+      if (!isNaN(parsed)) {
+        timestamp = parsed;
+      } else {
+        // Try to parse as a number string
+        const num = parseInt(date, 10);
+        if (!isNaN(num)) {
+          timestamp = num < 10000000000 ? num * 1000 : num;
+        } else {
+          return "Invalid date";
+        }
+      }
+    } else {
+      return "Invalid date";
+    }
+
+    const d = new Date(timestamp);
     if (isNaN(d.getTime())) return "Invalid date";
     return d.toLocaleString("en-US", {
       month: "short",

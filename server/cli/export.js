@@ -1,14 +1,26 @@
 // server/cli/export.js
 // Export command with query language and smart splitting
 
-import { join } from "path";
+import { join, resolve } from "path";
 import { writeFileSync } from "fs";
 import Database from "better-sqlite3";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import os from "os";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Unified database path resolution (must match bin/cli.js and server/db/index.ts)
+// For global npm: defaults to ~/.curator/curator.db (user home)
+// For project-scoped: set AI_CURATOR_DATA_DIR=./data
+function resolveDatabasePath(dataDir) {
+  if (dataDir) {
+    return join(resolve(dataDir), "curator.db");
+  }
+  // Default to ~/.curator for global npm consistency
+  return join(os.homedir(), ".curator", "curator.db");
+}
 
 // Query parser for filter syntax
 // Supports: status=approved AND quality>3 OR category=coding
@@ -181,7 +193,7 @@ export class ExportCommand {
       stratify: options.stratify !== false, // default true
       seed: options.seed || null,
       includeMetadata: options.includeMetadata !== false,
-      dataDir: options.dataDir || join(process.cwd(), "data"),
+      dataDir: options.dataDir, // Don't default here - resolve in execute()
       ...options,
     };
 
@@ -193,8 +205,8 @@ export class ExportCommand {
     console.log("📤 Exporting dataset...\n");
 
     try {
-      // Connect to database
-      const dbPath = join(this.options.dataDir, "curator.db");
+      // Connect to database using unified path resolution
+      const dbPath = resolveDatabasePath(this.options.dataDir);
       this.db = new Database(dbPath);
 
       // Get dataset info

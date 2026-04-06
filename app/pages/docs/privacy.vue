@@ -23,7 +23,7 @@
               <line x1="12" y1="3" x2="12" y2="15" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Your Data Stays Local</h2>
+          <h2 class="text-xl font-semibold">Your Data Stays Local</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           All training data is stored in a local SQLite database on your machine. No cloud services,
@@ -54,7 +54,7 @@
               <path d="m9 12 2 2 4-4" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">No Telemetry</h2>
+          <h2 class="text-xl font-semibold">No Telemetry</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           No analytics, error reports, or usage statistics are collected. The app works completely
@@ -95,7 +95,7 @@
               <polyline points="10 9 9 9 8 9" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">You Control Exports</h2>
+          <h2 class="text-xl font-semibold">You Control Exports</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           Export data to JSON, JSONL, or Alpaca formats when you're ready. No automatic uploads or
@@ -127,7 +127,7 @@
               <line x1="9" y1="21" x2="9" y2="9" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Plugin Control</h2>
+          <h2 class="text-xl font-semibold">Plugin Control</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           Enable or disable individual plugin sources. Global kill switch to stop all live capture
@@ -163,7 +163,7 @@
             <line x1="15" y1="9" x2="9" y2="15" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Data Storage</h3>
+        <h3 class="text-lg font-semibold">Data Storage</h3>
       </div>
       <div class="grid md:grid-cols-2 gap-4 text-sm">
         <div class="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -237,7 +237,7 @@
             <line x1="12" y1="3" x2="12" y2="15" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Data Location</h3>
+        <h3 class="text-lg font-semibold">Data Location</h3>
       </div>
       <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 font-mono text-sm mb-4">
         <div class="mb-2">
@@ -271,7 +271,7 @@
             <line x1="12" y1="16" x2="12.01" y2="16" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Privacy Best Practices</h3>
+        <h3 class="text-lg font-semibold">Privacy Best Practices</h3>
       </div>
       <div class="grid md:grid-cols-2 gap-4 text-sm">
         <ul class="space-y-2">

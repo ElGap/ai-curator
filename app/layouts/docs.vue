@@ -10,7 +10,7 @@
           <span class="text-xl font-bold text-gray-900 dark:text-white">AI Curator</span>
           <span
             class="px-2 py-0.5 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded-full"
-            >0.3.0-beta</span
+            >beta</span
           >
         </NuxtLink>
         <p class="text-xs mb-7 text-gray-400">Privacy-first dataset curation for LLM fine-tuning</p>

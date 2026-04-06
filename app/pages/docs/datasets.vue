@@ -20,7 +20,7 @@
             <polyline points="14 2 14 8 20 8" />
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">What is a Dataset?</h2>
+        <h2 class="text-xl font-semibold">What is a Dataset?</h2>
       </div>
       <p class="text-secondary mb-6">
         A dataset in AI Curator is a collection of training samples (instruction-output pairs)
@@ -45,7 +45,7 @@
               <polyline points="14 2 14 8 20 8" />
             </svg>
           </div>
-          <div class="font-medium mb-2 text-gray-900 dark:text-white">Samples</div>
+          <div class="font-medium mb-2">Samples</div>
           <p class="text-secondary">
             Individual training examples with instruction, input, and output
           </p>
@@ -69,7 +69,7 @@
               <line x1="9" y1="21" x2="9" y2="9" />
             </svg>
           </div>
-          <div class="font-medium mb-2 text-gray-900 dark:text-white">Categories</div>
+          <div class="font-medium mb-2">Categories</div>
           <p class="text-secondary">Organize by domain: code, general, reasoning, etc.</p>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -91,7 +91,7 @@
               />
             </svg>
           </div>
-          <div class="font-medium mb-2 text-gray-900 dark:text-white">Quality Ratings</div>
+          <div class="font-medium mb-2">Quality Ratings</div>
           <p class="text-secondary">1-5 star rating system for filtering exports</p>
         </div>
       </div>
@@ -117,7 +117,7 @@
             <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+        <h2 class="text-xl font-semibold">
           Complete Dataset Workflow
         </h2>
       </div>
@@ -131,7 +131,7 @@
             <span class="text-sm font-bold text-blue-600 dark:text-blue-400">1</span>
           </div>
           <div>
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Create Dataset</h3>
+            <h3 class="font-semibold mb-1">Create Dataset</h3>
             <p class="text-secondary text-sm mb-2">
               Start by creating a new dataset with a name and optional description. Set your goal
               (e.g., 100, 500, or 1000 samples) to track progress.
@@ -152,7 +152,7 @@
             <span class="text-sm font-bold text-blue-600 dark:text-blue-400">2</span>
           </div>
           <div>
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Add Samples</h3>
+            <h3 class="font-semibold mb-1">Add Samples</h3>
             <p class="text-secondary text-sm mb-2">
               Add training samples through any of these methods:
             </p>
@@ -189,7 +189,7 @@
             <span class="text-sm font-bold text-blue-600 dark:text-blue-400">3</span>
           </div>
           <div>
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Review & Organize</h3>
+            <h3 class="font-semibold mb-1">Review & Organize</h3>
             <p class="text-secondary text-sm mb-2">Review imported samples and organize them:</p>
             <ul class="text-sm text-secondary space-y-1 ml-4 mb-2">
               <li>• Set quality ratings (1-5 stars)</li>
@@ -213,7 +213,7 @@
             <span class="text-sm font-bold text-blue-600 dark:text-blue-400">4</span>
           </div>
           <div>
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Analyze & Improve</h3>
+            <h3 class="font-semibold mb-1">Analyze & Improve</h3>
             <p class="text-secondary text-sm mb-2">Check your dataset health with analytics:</p>
             <ul class="text-sm text-secondary space-y-1 ml-4 mb-2">
               <li>• View distribution by category and quality</li>
@@ -236,7 +236,7 @@
             <span class="text-sm font-bold text-green-600 dark:text-green-400">5</span>
           </div>
           <div>
-            <h3 class="font-semibold text-gray-900 dark:text-white mb-1">Export for Training</h3>
+            <h3 class="font-semibold mb-1">Export for Training</h3>
             <p class="text-secondary text-sm mb-2">
               Export your curated dataset in the format you need:
             </p>
@@ -275,7 +275,7 @@
             <path d="M12 5v14M5 12h14" />
           </svg>
         </div>
-        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+        <h2 class="text-xl font-semibold">
           Creating Samples Manually
         </h2>
       </div>
@@ -285,7 +285,7 @@
       </p>
       <div class="grid md:grid-cols-2 gap-4 mb-4">
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h4 class="font-medium mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+          <h4 class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -312,7 +312,7 @@
           </ol>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <h4 class="font-medium mb-2 text-gray-900 dark:text-white flex items-center gap-2">
+          <h4 class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -364,7 +364,7 @@
               <path d="M2 12l10 5 10-5" />
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Active Dataset</h3>
+          <h3 class="text-lg font-semibold">Active Dataset</h3>
         </div>
         <p class="text-secondary text-sm mb-4">
           One dataset can be "active" at a time. This is the default destination for live capture
@@ -397,7 +397,7 @@
               <polyline points="10 9 9 9 8 9" />
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Sample Status</h3>
+          <h3 class="text-lg font-semibold">Sample Status</h3>
         </div>
         <p class="text-secondary text-sm mb-3">Samples go through workflow states:</p>
         <div class="flex gap-2 flex-wrap text-xs">
@@ -441,7 +441,7 @@
             <path d="M12 22l10-5-10-5-10 5 10 5z" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Best Practices</h3>
+        <h3 class="text-lg font-semibold">Best Practices</h3>
       </div>
       <div class="grid md:grid-cols-2 gap-4 text-sm">
         <ul class="space-y-2">

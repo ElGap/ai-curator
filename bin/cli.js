@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S npx tsx
 
 import { spawn, exec } from "child_process";
 import path from "path";
@@ -33,9 +33,11 @@ if (!process.env.AI_CURATOR_PORT) {
 }
 
 // Unified database path resolution (must match server/db/index.ts)
+// For global npm: defaults to ~/.curator/curator.db (user home)
+// For project-scoped: set AI_CURATOR_DATA_DIR=./data
 const dataDir = process.env.AI_CURATOR_DATA_DIR
   ? path.resolve(process.env.AI_CURATOR_DATA_DIR)
-  : path.resolve("./data");
+  : path.join(os.homedir(), ".curator");
 const dbPath = process.env.DATABASE_URL
   ? path.resolve(process.env.DATABASE_URL)
   : path.join(dataDir, "curator.db");
@@ -119,6 +121,9 @@ async function main() {
     case "reset":
     case "clean":
       await handleReset(args.slice(1));
+      break;
+    case "clear":
+      await handleClear(args.slice(1));
       break;
     case "help":
     case "--help":
@@ -727,50 +732,18 @@ async function handleImport(args) {
     console.log(`Smart mode: ${options.smart ? "Yes" : "No"}`);
     console.log("");
 
-    // Check file size to determine which importer to use
-    const stats = fs.statSync(processedFilePath);
-    const fileSizeMB = stats.size / (1024 * 1024);
+    // Use unified import command
+    const { importCommand } = await import("../server/cli/import-command.ts");
 
-    // Use V2 for large files (>10MB) or when workers/resume specified
-    const useV2 = fileSizeMB > 10 || options.workers || options.resume || options.chunkSize;
-
-    let result;
-
-    if (useV2) {
-      console.log(`📦 Large file detected (${fileSizeMB.toFixed(1)} MB), using enhanced importer`);
-      const { ImportCommandV2 } = await import("../server/cli/import-v2.js");
-
-      // When in smart mode, don't pass status/category CLI options - let records carry their values
-      const importOptions = options.smart
-        ? (({ status: _status, category: _category, ...rest }) => rest)(options)
-        : options;
-
-      const command = new ImportCommandV2({
-        filePath: processedFilePath,
-        dataDir: process.cwd() + "/data",
-        datasetId: targetDatasetId,
-        ...importOptions,
-      });
-
-      result = await command.execute();
-    } else {
-      // Use V1 for small files
-      const { ImportCommand } = await import("../server/cli/import.js");
-
-      // When in smart mode, don't pass status/category CLI options - let records carry their values
-      const importOptions = options.smart
-        ? (({ status: _status, category: _category, ...rest }) => rest)(options)
-        : options;
-
-      const command = new ImportCommand({
-        filePath: processedFilePath,
-        dataDir: process.cwd() + "/data",
-        datasetId: targetDatasetId,
-        ...importOptions,
-      });
-
-      result = await command.execute();
-    }
+    const result = await importCommand({
+      filePath: processedFilePath,
+      datasetId: targetDatasetId,
+      format: options.format,
+      category: options.category,
+      status: options.status,
+      dryRun: options.dryRun,
+      dataDir: dataDir,
+    });
 
     // Clean up temp file if created during smart import
     if (options._tempFile && fs.existsSync(options._tempFile)) {
@@ -862,7 +835,7 @@ Examples:
   const { ExportCommand } = await import("../server/cli/export.js");
 
   const options = {
-    dataDir: process.cwd() + "/data",
+    // dataDir defaults to ~/.curator via export.js resolveDatabasePath
   };
 
   // Parse options
@@ -1080,6 +1053,8 @@ Commands:
   curator download <id>      Download and import from Kaggle/HF
   curator import <file>      Import dataset from file (JSON, JSONL, CSV)
   curator export [options]   Export dataset to file
+  curator clear              Clear all samples from dataset (with confirmation)
+  curator clear --force      Clear without confirmation
   curator reset              Reset database completely (creates fresh General dataset)
   curator reset --force      Reset without confirmation
   curator clean              Alias for reset
@@ -1100,6 +1075,10 @@ Download Options:
   --status <status>        Initial status: draft|review|approved
   --workers <n>            Number of parallel workers
   --no-import              Download only, skip import
+
+Clear Options:
+  --dataset <id>           Dataset ID to clear (default: active dataset)
+  --force                  Clear without confirmation
 
 Import Options:
   --dataset <id>           Target dataset ID (default: active dataset)
@@ -1165,6 +1144,15 @@ Examples:
 
   # Export high quality samples only
   curator export --filter "quality>=4 AND status=approved" --output high-quality.json
+
+  # Clear all samples from active dataset (confirmation required)
+  curator clear
+
+  # Clear specific dataset
+  curator clear --dataset 2
+
+  # Force clear without confirmation
+  curator clear --force
 
   # Reset database (confirmation required)
   curator reset
@@ -1268,6 +1256,7 @@ Examples:
     datasetId: args[0],
     autoImport: true,
     workers: 4,
+    dataDir: dataDir, // Pass unified dataDir
   };
 
   // Parse options
@@ -1310,9 +1299,13 @@ async function handleReset(args) {
   console.log("  - All training samples");
   console.log("  - All datasets");
   console.log("  - All import history");
-  console.log(
-    "\nA new default dataset will be created with name 'General' and default settings.\n"
-  );
+  console.log("\nTwo fresh datasets will be created:\n");
+  console.log("  📡 Live Capture Inbox (ID: 1)");
+  console.log("     → For capturing conversations & code from your workflow");
+  console.log("     → Disabled by default, enable in Settings when ready\n");
+  console.log("  🎓 EdukaAI Starter Pack (ID: 2) [ACTIVE]");
+  console.log("     → 75 premium football training samples pre-loaded");
+  console.log("     → Ready for immediate 5-minute fine-tuning\n");
 
   if (!force) {
     console.log("Are you sure you want to continue? (yes/no)");
@@ -1534,23 +1527,41 @@ async function handleReset(args) {
       // sqlite_sequence might not have entries yet
     }
 
-    // Insert seed data
+    // Insert seed data - TWO datasets for optimal UX
 
-    // Default dataset
-    const insertDatasetSql = `
+    // Dataset 1: Live Capture Inbox (for live capture, disabled by default)
+    const insertLiveCaptureSql = `
       INSERT INTO datasets (
         id, name, description, is_active, is_archived, default_quality, default_category, 
         default_auto_approve, goal_samples, goal_name, sample_count, approved_count,
         created_at, updated_at
       )
       VALUES (
-        1, 'General', 'Default dataset for training samples', 1, 0, 'medium', 'general', 
-        0, 100, 'First Fine-Tuning', 0, 0,
+        1, '📡 Live Capture Inbox', 'Your personal data collection inbox. Captures conversations, code snippets, and any text you want to train your AI on. Perfect for building custom datasets from your daily workflow. Live capture is disabled by default—enable it in Settings when ready.', 
+        0, 0, 'medium', 'captured', 
+        0, 500, 'Personal AI Assistant', 0, 0,
         (strftime('%s', 'now') * 1000),
         (strftime('%s', 'now') * 1000)
       )
     `;
-    db.prepare(insertDatasetSql).run();
+    db.prepare(insertLiveCaptureSql).run();
+
+    // Dataset 2: EdukaAI Starter Pack (pre-loaded, active by default)
+    const insertStarterPackSql = `
+      INSERT INTO datasets (
+        id, name, description, is_active, is_archived, default_quality, default_category, 
+        default_auto_approve, goal_samples, goal_name, sample_count, approved_count,
+        created_at, updated_at
+      )
+      VALUES (
+        2, '🎓 EdukaAI Starter Pack', 'A curated collection of 75 premium football training samples designed for quick 5-minute fine-tuning. Features immersive player interviews, tactical analysis, and fan perspectives from the Kingston United vs. Newport County thriller. Perfect for your first LLM training experience!', 
+        1, 0, 'high', 'football', 
+        0, 75, '🚀 First Fine-Tuning (Ready!)', 0, 0,
+        (strftime('%s', 'now') * 1000),
+        (strftime('%s', 'now') * 1000)
+      )
+    `;
+    db.prepare(insertStarterPackSql).run();
 
     // Default sources
     db.prepare(
@@ -1564,11 +1575,11 @@ async function handleReset(args) {
     `
     ).run();
 
-    // Capture settings - DISABLED by default
+    // Capture settings - DISABLED by default, pointing to Live Capture Inbox
     db.prepare(
       `
       INSERT OR REPLACE INTO capture_settings (id, default_dataset_id, default_dataset_name, default_status, default_quality, is_enabled)
-      VALUES (1, 1, 'General', 'draft', 3, 0)
+      VALUES (1, 1, '📡 Live Capture Inbox', 'draft', 3, 0)
     `
     ).run();
 
@@ -1580,18 +1591,84 @@ async function handleReset(args) {
     `
     ).run();
 
+    // First-run auto-import: Load EdukaAI Starter Pack samples if available
+    try {
+      const starterPackPath = path.join(packageRoot, "datasets", "starter-pack", "samples.json");
+      const metadataPath = path.join(packageRoot, "datasets", "starter-pack", "metadata.json");
+
+      if (fs.existsSync(starterPackPath) && fs.existsSync(metadataPath)) {
+        console.log("\n📦 Loading EdukaAI Starter Pack...");
+
+        const metadata = JSON.parse(fs.readFileSync(metadataPath, "utf-8"));
+        const samples = JSON.parse(fs.readFileSync(starterPackPath, "utf-8"));
+
+        if (Array.isArray(samples) && samples.length > 0) {
+          const insertSample = db.prepare(`
+            INSERT INTO samples (
+              dataset_id, dataset_name, instruction, input, output, system_prompt,
+              category, difficulty, quality_rating, source, status, context, metadata,
+              created_at, updated_at
+            ) VALUES (
+              ?, ?, ?, ?, ?, ?, ?, ?, ?, 'starter_pack', 'approved', ?, ?,
+              (strftime('%s', 'now') * 1000), (strftime('%s', 'now') * 1000)
+            )
+          `);
+
+          let importedCount = 0;
+          for (const sample of samples) {
+            try {
+              insertSample.run(
+                metadata.dataset_id || 2,
+                metadata.dataset_name || "🎓 EdukaAI Starter Pack",
+                sample.instruction || "",
+                sample.input || "",
+                sample.output || "",
+                sample.system_prompt || sample.system || "",
+                sample.category || metadata.default_category || "football",
+                sample.difficulty || "intermediate",
+                sample.quality_rating || 4,
+                JSON.stringify(sample.context || {}),
+                JSON.stringify(sample.metadata || {})
+              );
+              importedCount++;
+            } catch (_e) {
+              // Skip invalid samples
+            }
+          }
+
+          // Update dataset counts
+          db.prepare(
+            `
+            UPDATE datasets 
+            SET sample_count = ?, approved_count = ?, updated_at = (strftime('%s', 'now') * 1000)
+            WHERE id = ?
+          `
+          ).run(importedCount, importedCount, metadata.dataset_id || 2);
+
+          if (importedCount > 0) {
+            console.log(`✅ Loaded ${importedCount} premium samples into Starter Pack`);
+          }
+        }
+      }
+    } catch (_e) {
+      // Silent fail - starter pack is optional
+    }
+
     db.close();
 
     console.log("✅ Database reset complete!");
     console.log(`   Deleted ${sampleCount} samples`);
     console.log(`   Deleted ${datasetCount} datasets`);
-    console.log(`   Created new 'General' dataset (ID: 1)`);
-    console.log(`   Goal: First Fine-Tuning (100 samples)`);
-    console.log(`   Dataset set as active`);
+    console.log(`   Created '📡 Live Capture Inbox' (ID: 1) - Ready for your data`);
+    console.log(`   Created '🎓 EdukaAI Starter Pack' (ID: 2) - Active, ready for training`);
+    console.log(`   📚 75 premium samples loaded and ready to train!`);
     console.log(`   Live capture: DISABLED by default\n`);
 
-    console.log("💡 Tip: Start the server with 'curator' to begin fresh.");
-    console.log("   Enable live capture in Settings when ready to receive data.");
+    console.log("💡 Quick start options:");
+    console.log("   1. 🚀 Start training immediately (5 min):");
+    console.log("      curator export --dataset 2 --format mlx --output train.jsonl");
+    console.log("   2. Browse samples in UI: curator");
+    console.log("   3. Enable live capture: curator → Settings → Live Capture");
   } catch (error) {
     console.error(`\n❌ Error resetting database: ${error.message}`);
     console.error(error.stack);
@@ -1717,3 +1794,62 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
+
+async function handleClear(args) {
+  // Check for help
+  if (args.includes("--help") || args.includes("-h")) {
+    console.log(`
+Clear Command Options:
+  --dataset <id>           Dataset ID to clear (default: active dataset)
+  --force                  Clear without confirmation
+  --data-dir <path>        Custom data directory
+  --help                   Show this help
+
+Examples:
+  # Clear active dataset (prompts for confirmation)
+  curator clear
+
+  # Clear specific dataset
+  curator clear --dataset 2
+
+  # Clear without confirmation (use with caution!)
+  curator clear --force
+
+  # Clear with custom data directory
+  curator clear --data-dir ./my-data
+`);
+    process.exit(0);
+  }
+
+  const options = {
+    datasetId: undefined,
+    dataDir: dataDir,
+    force: false,
+  };
+
+  // Parse options
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    switch (arg) {
+      case "--dataset":
+        options.datasetId = parseInt(args[++i]);
+        break;
+      case "--force":
+        options.force = true;
+        break;
+      case "--data-dir":
+        options.dataDir = args[++i];
+        break;
+    }
+  }
+
+  const { clearCommand } = await import("../server/cli/clear.ts");
+  const result = await clearCommand(options);
+
+  if (!result.success) {
+    console.error(`\n❌ ${result.error || "Clear failed"}`);
+    process.exit(1);
+  }
+
+  process.exit(0);
+}

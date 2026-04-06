@@ -443,12 +443,16 @@
     hasMore: false,
   });
 
-  // Get current dataset ID from URL only (no active dataset fallback)
+  // Get current dataset ID from URL or default to first available dataset
   const currentDatasetId = computed(() => {
     const urlDatasetId = route.query.dataset;
     if (urlDatasetId) {
       const id = parseInt(urlDatasetId as string);
       if (!isNaN(id)) return id;
+    }
+    // Default to first available dataset if none specified
+    if (datasets.value.length > 0) {
+      return datasets.value[0].id;
     }
     return null;
   });
@@ -745,6 +749,15 @@
     };
     return categories[category] || category;
   };
+
+  // Watch for dataset changes and reload samples
+  watch(currentDatasetId, async (newId, oldId) => {
+    if (newId !== oldId) {
+      pagination.value.offset = 0; // Reset to first page
+      await loadSamples();
+      await loadStats();
+    }
+  });
 
   onMounted(async () => {
     await loadDatasets();

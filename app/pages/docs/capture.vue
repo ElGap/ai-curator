@@ -2,9 +2,9 @@
   <div class="space-y-8">
     <section class="card">
       <div class="flex items-center gap-3 mb-4">
-        <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Universal Capture API</h2>
+        <h2 class="text-2xl font-bold">Universal Capture API</h2>
         <span
-          class="px-2 py-1 text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 rounded-full"
+          class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300 rounded-full"
           >Experimental</span
         >
       </div>
@@ -17,7 +17,7 @@
           integrations.
         </p>
 
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">
+        <h3 class="text-lg font-semibold mt-6 mb-3">
           Why This Matters
         </h3>
 
@@ -40,7 +40,7 @@
           </li>
         </ul>
 
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3">
+        <h3 class="text-lg font-semibold mt-6 mb-3">
           Getting Started
         </h3>
 
@@ -55,7 +55,7 @@
               <a
                 href="https://opencode.ai"
                 target="_blank"
-                class="font-semibold text-gray-900 dark:text-white hover:underline"
+                class="font-semibold hover:underline"
               >
                 OpenCode Plugin
               </a>
@@ -70,7 +70,7 @@
               <a
                 href="https://openwebui.com"
                 target="_blank"
-                class="font-semibold text-gray-900 dark:text-white hover:underline"
+                class="font-semibold hover:underline"
               >
                 OpenWebUI Plugin
               </a>
@@ -89,37 +89,37 @@
       </div>
 
       <div class="bg-gray-900 text-gray-100 p-4 rounded-lg font-mono text-sm overflow-x-auto mb-4">
-        <div class="text-green-400 mb-2">POST /api/capture</div>
-        <div class="text-blue-400">Content-Type: application/json</div>
+        <div class="text-gray-300 mb-2">POST /api/capture</div>
+        <div class="text-gray-400">Content-Type: application/json</div>
       </div>
 
-      <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">Key Features</h3>
+      <h3 class="font-semibold mb-2">Key Features</h3>
       <ul class="space-y-2 text-gray-600 dark:text-gray-400 mb-6">
         <li>
-          <strong class="text-gray-900 dark:text-white">Universal Format:</strong> Single schema for
+          <strong>Universal Format:</strong> Single schema for
           all data sources
         </li>
         <li>
-          <strong class="text-gray-900 dark:text-white">No Authentication:</strong> Local-first
+          <strong>No Authentication:</strong> Local-first
           design, runs on localhost
         </li>
         <li>
-          <strong class="text-gray-900 dark:text-white">Auto-Enrichment:</strong> Automatic
+          <strong>Auto-Enrichment:</strong> Automatic
           categorization and quality scoring
         </li>
         <li>
-          <strong class="text-gray-900 dark:text-white">Duplicate Detection:</strong> Prevents
+          <strong>Duplicate Detection:</strong> Prevents
           duplicate entries
         </li>
         <li>
-          <strong class="text-gray-900 dark:text-white">Batch Support:</strong> Up to 100 records
+          <strong>Batch Support:</strong> Up to 100 records
           per request
         </li>
       </ul>
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Request Schema</h2>
+      <h2 class="text-xl font-semibold mb-4">Request Schema</h2>
 
       <div class="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4">
         <h4 class="font-semibold mb-2 text-white">Basic Structure</h4>
@@ -172,7 +172,7 @@
 }</code></pre>
       </div>
 
-      <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Core Fields</h4>
+      <h4 class="font-semibold mb-2">Core Fields</h4>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
           <thead
@@ -187,31 +187,31 @@
           </thead>
           <tbody>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">source</td>
+              <td class="px-4 py-2 font-mono">source</td>
               <td class="px-4 py-2">string</td>
               <td class="px-4 py-2">Yes</td>
               <td class="px-4 py-2">Source identifier (e.g., "opencode", "import-csv")</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">instruction</td>
+              <td class="px-4 py-2 font-mono">instruction</td>
               <td class="px-4 py-2">string</td>
               <td class="px-4 py-2">Yes</td>
               <td class="px-4 py-2">The question, prompt, or user request</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">output</td>
+              <td class="px-4 py-2 font-mono">output</td>
               <td class="px-4 py-2">string</td>
               <td class="px-4 py-2">Yes</td>
               <td class="px-4 py-2">The answer, response, or AI output</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">input</td>
+              <td class="px-4 py-2 font-mono">input</td>
               <td class="px-4 py-2">string</td>
               <td class="px-4 py-2">No</td>
               <td class="px-4 py-2">Additional context provided (code snippets, etc.)</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">systemPrompt</td>
+              <td class="px-4 py-2 font-mono">systemPrompt</td>
               <td class="px-4 py-2">string</td>
               <td class="px-4 py-2">No</td>
               <td class="px-4 py-2">System instructions given to the model</td>
@@ -222,7 +222,7 @@
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Response Schema</h2>
+      <h2 class="text-xl font-semibold mb-4">Response Schema</h2>
 
       <div class="bg-gray-900 text-gray-100 p-4 rounded-lg mb-4">
         <h4 class="font-semibold mb-2 text-white">Success Response (200)</h4>
@@ -273,7 +273,7 @@
 }</code></pre>
       </div>
 
-      <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Error Codes</h4>
+      <h4 class="font-semibold mb-2">Error Codes</h4>
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
           <thead
@@ -287,32 +287,32 @@
           </thead>
           <tbody>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">VALIDATION_ERROR</td>
+              <td class="px-4 py-2 font-mono">VALIDATION_ERROR</td>
               <td class="px-4 py-2">400</td>
               <td class="px-4 py-2">Request schema validation failed</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">SOURCE_NOT_FOUND</td>
+              <td class="px-4 py-2 font-mono">SOURCE_NOT_FOUND</td>
               <td class="px-4 py-2">400</td>
               <td class="px-4 py-2">Source identifier not registered</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">SOURCE_DISABLED</td>
+              <td class="px-4 py-2 font-mono">SOURCE_DISABLED</td>
               <td class="px-4 py-2">403</td>
               <td class="px-4 py-2">Source is disabled in settings</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">DATASET_NOT_FOUND</td>
+              <td class="px-4 py-2 font-mono">DATASET_NOT_FOUND</td>
               <td class="px-4 py-2">404</td>
               <td class="px-4 py-2">Specified dataset ID doesn't exist</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">NO_ACTIVE_DATASET</td>
+              <td class="px-4 py-2 font-mono">NO_ACTIVE_DATASET</td>
               <td class="px-4 py-2">400</td>
               <td class="px-4 py-2">No dataset specified and no active dataset</td>
             </tr>
             <tr class="border-b border-gray-200 dark:border-gray-700">
-              <td class="px-4 py-2 font-mono text-gray-900 dark:text-white">INTERNAL_ERROR</td>
+              <td class="px-4 py-2 font-mono">INTERNAL_ERROR</td>
               <td class="px-4 py-2">500</td>
               <td class="px-4 py-2">Unexpected server error</td>
             </tr>
@@ -322,11 +322,11 @@
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Usage Examples</h2>
+      <h2 class="text-xl font-semibold mb-4">Usage Examples</h2>
 
       <div class="space-y-6">
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">1. Python Script</h3>
+          <h3 class="font-semibold mb-2">1. Python Script</h3>
           <p class="text-gray-600 dark:text-gray-400 mb-2">
             Import historical data from any source using Python:
           </p>
@@ -367,7 +367,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
         </div>
 
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">2. cURL Command</h3>
+          <h3 class="font-semibold mb-2">2. cURL Command</h3>
           <p class="text-gray-600 dark:text-gray-400 mb-2">
             Quick test using cURL from command line:
           </p>
@@ -394,11 +394,11 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Best Practices</h2>
+      <h2 class="text-xl font-semibold mb-4">Best Practices</h2>
 
       <div class="space-y-6">
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">
+          <h3 class="font-semibold mb-2">
             1. Batch Records Efficiently
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
@@ -413,7 +413,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
         </div>
 
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">
+          <h3 class="font-semibold mb-2">
             2. Use Session IDs for Grouping
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
@@ -423,7 +423,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
         </div>
 
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">3. Provide Rich Context</h3>
+          <h3 class="font-semibold mb-2">3. Provide Rich Context</h3>
           <p class="text-gray-600 dark:text-gray-400">
             Include file paths, environment info, and model details when available. This creates
             higher quality training data and better context for review.
@@ -431,7 +431,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
         </div>
 
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">
+          <h3 class="font-semibold mb-2">
             4. Use messageId for Duplicate Prevention
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
@@ -441,7 +441,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
         </div>
 
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">
+          <h3 class="font-semibold mb-2">
             5. Leverage Auto-Enrichment
           </h3>
           <p class="text-gray-600 dark:text-gray-400">
@@ -451,7 +451,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
         </div>
 
         <div>
-          <h3 class="font-semibold mb-2 text-gray-900 dark:text-white">6. Test with Dry Run</h3>
+          <h3 class="font-semibold mb-2">6. Test with Dry Run</h3>
           <p class="text-gray-600 dark:text-gray-400">
             Before importing large datasets, use dryRun: true to validate your data format without
             actually storing anything.
@@ -461,7 +461,7 @@ print(f"Imported: {response.json()['capture']['summary']['created']} records")</
     </section>
 
     <section class="card">
-      <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Rich Context Fields</h2>
+      <h2 class="text-xl font-semibold mb-4">Rich Context Fields</h2>
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Provide additional context to enhance your training data. All context fields are optional -
         include what you have, omit what you don't.

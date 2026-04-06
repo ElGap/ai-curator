@@ -1,100 +1,50 @@
-import { z } from "zod";
-import { getDb } from "../../db";
-import { samples, datasets } from "../../db/schema";
-import { eq } from "drizzle-orm";
+// server/api/import/json.post.ts
+// JSON import API endpoint - uses unified ImportService
 
-const jsonImportSchema = z.object({
-  samples: z.array(
-    z.object({
-      instruction: z.string().min(1),
-      input: z.string().optional().nullable(),
-      output: z.string().min(1),
-      systemPrompt: z.string().optional().nullable(),
-      category: z.string().optional().nullable(),
-      difficulty: z.string().optional().nullable(),
-      qualityRating: z.number().min(1).max(5).optional().nullable(),
-      tags: z.array(z.string()).optional().nullable(),
-      notes: z.string().optional().nullable(),
-    })
-  ),
-  format: z.enum(["alpaca", "sharegpt", "raw"]).default("raw"),
+import { z } from "zod";
+import { importService } from "../../services/import/index.ts";
+import { rawSampleSchema } from "../../services/import/index.ts";
+import type { ImportSource } from "../../services/import/index.ts";
+
+// API-specific schema extending the base schema
+const apiImportSchema = z.object({
+  samples: z.array(rawSampleSchema).min(1).max(10000), // Limit to 10K per request
   datasetId: z.number().optional(),
+  format: z.enum(["alpaca", "sharegpt", "raw"]).default("raw"),
+  options: z
+    .object({
+      status: z.enum(["draft", "review", "approved", "rejected"]).optional(),
+      dryRun: z.boolean().optional(),
+    })
+    .optional(),
 });
 
+/**
+ * POST /api/import/json
+ * Import samples from JSON array using unified ImportService
+ */
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
-    const data = jsonImportSchema.parse(body);
+    const data = apiImportSchema.parse(body);
 
-    const db = getDb();
-
-    // Get the target dataset - use provided datasetId or fall back to active
-    let targetDataset;
-
-    if (data.datasetId) {
-      // Use the dataset specified in the request
-      targetDataset = await db.query.datasets.findFirst({
-        where: eq(datasets.id, data.datasetId),
-      });
-
-      if (!targetDataset) {
-        throw createError({
-          statusCode: 400,
-          statusMessage: `Dataset with ID ${data.datasetId} not found.`,
-        });
-      }
-    } else {
-      // Fall back to active dataset for backward compatibility
-      targetDataset = await db.query.datasets.findFirst({
-        where: eq(datasets.isActive, 1),
-      });
-
-      if (!targetDataset) {
-        throw createError({
-          statusCode: 400,
-          statusMessage:
-            "No dataset specified and no active dataset found. Please select a dataset or activate one.",
-        });
-      }
-    }
-
-    let imported = 0;
-    let failed = 0;
-    const errors: string[] = [];
-
-    // Import each sample
-    for (const ex of data.samples) {
-      try {
-        await db.insert(samples).values({
-          datasetId: targetDataset.id,
-          datasetName: targetDataset.name,
-          instruction: ex.instruction,
-          input: ex.input || null,
-          output: ex.output,
-          systemPrompt: ex.systemPrompt || null,
-          category: ex.category || "general",
-          difficulty: ex.difficulty || "intermediate",
-          qualityRating: ex.qualityRating || 3,
-          notes: ex.notes || null,
-          tags: JSON.stringify(ex.tags || []),
-          source: "json",
-          status: "approved",
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-
-        imported++;
-      } catch (error) {
-        failed++;
-        errors.push(`Failed to import: ${error}`);
-      }
-    }
+    // Use unified ImportService - status is determined by UI based on quality rating
+    // UI sets status to "approved" if quality > 4, otherwise "draft"
+    const result = await importService.importSamples(data.samples, {
+      datasetId: data.datasetId,
+      // Don't override status - use what UI sent (or let samples use their own status)
+      status: data.options?.status,
+      source: "web" as ImportSource,
+      dryRun: data.options?.dryRun || false,
+    });
 
     return {
-      success: true,
-      imported,
-      failed,
-      message: `Successfully imported ${imported} samples${failed > 0 ? `, ${failed} failed` : ""}`,
+      success: result.success,
+      imported: result.imported,
+      failed: result.failed,
+      dataset: result.dataset,
+      message: `Successfully imported ${result.imported} samples${result.failed > 0 ? `, ${result.failed} failed` : ""}`,
+      errors: result.errors.slice(0, 10), // Limit errors in response
     };
   } catch (error) {
     console.error("Error importing JSON:", error);

@@ -8,10 +8,22 @@ import { SimpleWorkerPool } from "./workers/worker-pool-simple.js";
 import { ChunkedReader, calculateOptimalChunkSize } from "./chunked-reader.js";
 import { ResumeState } from "./resume-state.js";
 import { fileURLToPath } from "url";
-import { dirname, join } from "path";
+import { dirname, join, resolve } from "path";
+import os from "os";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Unified database path resolution (must match bin/cli.js and server/db/index.ts)
+// For global npm: defaults to ~/.curator/curator.db (user home)
+// For project-scoped: set AI_CURATOR_DATA_DIR=./data
+function resolveDatabasePath(dataDir) {
+  if (dataDir) {
+    return join(resolve(dataDir), "curator.db");
+  }
+  // Default to ~/.curator for global npm consistency
+  return join(os.homedir(), ".curator", "curator.db");
+}
 
 export class ImportCommandV2 {
   constructor(options = {}) {
@@ -27,7 +39,7 @@ export class ImportCommandV2 {
       category: options.category || null,
       status: options.status,
       resume: options.resume || false,
-      dataDir: options.dataDir || join(process.env.HOME || process.env.USERPROFILE, ".curator"),
+      dataDir: options.dataDir, // Don't default here - resolve in execute()
       onProgress: options.onProgress || this.defaultProgressHandler.bind(this),
       onError: options.onError || this.defaultErrorHandler.bind(this),
       ...options,
@@ -73,8 +85,8 @@ export class ImportCommandV2 {
         throw new Error(`File not found: ${this.options.filePath}`);
       }
 
-      // Connect to database
-      const dbPath = join(this.options.dataDir, "curator.db");
+      // Connect to database using unified path resolution
+      const dbPath = resolveDatabasePath(this.options.dataDir);
       this.db = new Database(dbPath);
 
       // Optimize SQLite for bulk inserts

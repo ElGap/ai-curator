@@ -30,7 +30,7 @@
       <div class="card">
         <div class="flex items-center gap-3 mb-4">
           <div
-            class="w-12 h-12 text-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
+            class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -58,8 +58,8 @@
           Upload a JSON file with training examples in Alpaca or ShareGPT format. Preview and import
           into your active dataset.
         </p>
-        <a
-          href="/import/json"
+        <NuxtLink
+          :to="{ path: '/import/json', query: { dataset: selectedDataset } }"
           class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors no-underline"
         >
           <svg
@@ -78,14 +78,14 @@
             <line x1="12" x2="12" y1="3" y2="15" />
           </svg>
           Upload JSON File
-        </a>
+        </NuxtLink>
       </div>
 
       <!-- Live Capture -->
       <div class="card">
         <div class="flex items-center gap-3 mb-4">
           <div
-            class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center"
+            class="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +97,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="text-blue-600 dark:text-blue-400"
+              class="text-gray-600 dark:text-gray-400"
             >
               <circle cx="12" cy="12" r="10" />
               <line x1="2" x2="22" y1="12" y2="12" />
@@ -107,7 +107,7 @@
             </svg>
           </div>
           <div>
-            <h3 class="font-semibold text-lg text-gray-900 dark:text-white">Live Capture</h3>
+            <h3 class="font-semibold text-lg">Live Capture</h3>
             <p class="text-sm text-secondary">Real-time conversation capture</p>
           </div>
         </div>
@@ -121,7 +121,7 @@
               <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
                 Active Dataset for Live Capture
               </p>
-              <p class="text-2xl font-bold text-blue-600 dark:text-blue-400 truncate">
+              <p class="text-2xl font-bold text-gray-700 dark:text-gray-300 truncate">
                 {{ captureDefault?.datasetName || "Loading..." }}
               </p>
               <p class="text-sm text-gray-600 dark:text-gray-300 mt-1 font-medium">
@@ -141,7 +141,7 @@
             class="flex flex-wrap items-center gap-3 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200 dark:border-gray-700 pt-3"
           >
             <span
-              class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded font-medium"
+              class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded font-medium"
               title="Use this ID for CLI commands: curator --dataset {{ captureDefault?.datasetId }}"
             >
               <svg
@@ -161,7 +161,7 @@
             <span class="flex items-center gap-1">
               <span
                 class="w-2 h-2 rounded-full"
-                :class="captureDefault?.isEnabled === false ? 'bg-red-500' : 'bg-green-500'"
+                :class="captureDefault?.isEnabled === false ? 'bg-gray-400' : 'bg-gray-600'"
               ></span>
               {{ captureDefault?.isEnabled === false ? "Disabled" : "Enabled" }}
             </span>
@@ -169,7 +169,7 @@
               <span
                 class="w-2 h-2 rounded-full"
                 :class="
-                  captureDefault?.defaultStatus === 'approved' ? 'bg-green-500' : 'bg-yellow-500'
+                  captureDefault?.defaultStatus === 'approved' ? 'bg-gray-600' : 'bg-gray-400'
                 "
               ></span>
               Status: {{ captureDefault?.defaultStatus || "draft" }}

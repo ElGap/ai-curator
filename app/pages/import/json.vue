@@ -6,6 +6,26 @@
     </div>
 
     <div class="card">
+      <!-- Dataset Info -->
+      <div
+        v-if="datasetId"
+        class="mb-6 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg"
+      >
+        <p class="text-sm text-blue-800 dark:text-blue-200">
+          <span class="font-medium">Target Dataset:</span> ID {{ datasetId }}
+        </p>
+      </div>
+      <div
+        v-else
+        class="mb-6 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg"
+      >
+        <p class="text-sm text-yellow-800 dark:text-yellow-200">
+          <span class="font-medium">⚠️ No dataset selected:</span> Samples will be imported into the
+          default dataset.
+          <NuxtLink to="/import" class="underline">Go back to select a dataset</NuxtLink>
+        </p>
+      </div>
+
       <div class="mb-6">
         <label class="form-label block mb-2">Upload JSON or JSONL File</label>
         <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
@@ -70,7 +90,12 @@
         <p class="text-gray-800 font-medium">✅ Import Complete!</p>
         <p class="text-gray-700 text-sm">Successfully imported {{ importedCount }} samples.</p>
         <div class="mt-3 flex gap-2">
-          <NuxtLink to="/samples" class="btn-primary"> View Dataset → </NuxtLink>
+          <NuxtLink
+            :to="{ path: '/samples', query: datasetId ? { dataset: datasetId } : undefined }"
+            class="btn-primary"
+          >
+            View Dataset →
+          </NuxtLink>
           <button class="btn-secondary" @click="reset">Import More</button>
         </div>
       </div>
@@ -126,6 +151,12 @@
 </template>
 
 <script setup>
+  const route = useRoute();
+  const datasetId = computed(() => {
+    const id = route.query.dataset;
+    return id ? parseInt(id, 10) : undefined;
+  });
+
   const fileInput = ref(null);
   const fileName = ref("");
   const fileSize = ref("");
@@ -252,20 +283,28 @@
         return;
       }
 
-      // Map fields - only accept standard field names
+      // Map fields - accept both camelCase and snake_case from JSON
       parsedSamples.value = rawData
         .map((item, idx) => {
+          // Resolve quality rating from multiple possible field names
+          const qualityRating = item.qualityRating ?? item.quality_rating ?? item.quality ?? 3;
+
+          // Auto-determine status based on quality rating
+          const status = qualityRating > 4 ? "approved" : "draft";
+
           return {
             id: idx.toString(),
             instruction: formatValue(item.instruction || ""),
             input: formatValue(item.input || ""),
             output: formatValue(item.output || ""),
-            systemPrompt: item.systemPrompt || item.system || null,
+            systemPrompt: item.systemPrompt || item.system_prompt || item.system || null,
             category: item.category || "general",
             difficulty: item.difficulty || "intermediate",
-            qualityRating: item.qualityRating || 3,
+            qualityRating: qualityRating,
             tags: item.tags || [],
-            source: "import",
+            status: status,
+            context: item.context || null,
+            source: "web",
           };
         })
         .filter((sample) => sample.instruction && sample.output);
@@ -302,11 +341,20 @@
         body: {
           samples: parsedSamples.value,
           format: "raw",
+          datasetId: datasetId.value,
         },
       });
 
       importedCount.value = response.imported;
       importComplete.value = true;
+
+      // Store import timestamp to trigger refresh on home page
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem("lastImportTime", Date.now().toString());
+      }
+
+      // Clear Nuxt data cache to refresh dataset stats
+      clearNuxtData();
     } catch (err) {
       // Better error handling to show validation details
       if (err.data && Array.isArray(err.data)) {

@@ -2,7 +2,7 @@
 // Download and import command for Kaggle and Hugging Face datasets
 
 import { KaggleClient, HuggingFaceClient } from "./external/index.js";
-import { ImportCommandV2 } from "./import-v2.js";
+import { importCommand } from "./import-command.js";
 import { join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { extractZip } from "./utils/zip.js";
@@ -210,15 +210,12 @@ export class DownloadCommand {
   }
 
   async importFile(filePath) {
-    const importCmd = new ImportCommandV2({
+    return await importCommand({
       filePath,
       datasetId: this.options.targetDatasetId,
       category: this.options.category,
       status: this.options.status,
-      workers: this.options.workers,
       dataDir: this.options.dataDir,
     });
-
-    return await importCmd.execute();
   }
 }

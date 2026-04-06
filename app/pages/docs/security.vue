@@ -21,7 +21,7 @@
           </svg>
         </div>
         <div>
-          <h2 class="text-xl font-semibold mb-2 text-gray-900 dark:text-white">
+          <h2 class="text-xl font-semibold mb-2">
             No Login Required (By Design)
           </h2>
           <p class="text-secondary text-sm">
@@ -56,7 +56,7 @@
               <path d="M12 8h.01" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Local Only (Default)</h2>
+          <h2 class="text-xl font-semibold">Local Only (Default)</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           Default configuration binds to localhost only. Safe for development with no additional
@@ -88,7 +88,7 @@
               <path d="m9 15 2 2 4-4" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          <h2 class="text-xl font-semibold">
             Strict Input Validation
           </h2>
         </div>
@@ -128,7 +128,7 @@
               <path d="M3 12A9 3 0 0 0 21 12" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">SQL Injection Safe</h2>
+          <h2 class="text-xl font-semibold">SQL Injection Safe</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           Drizzle ORM uses parameterized queries exclusively. No raw SQL with user input.
@@ -158,7 +158,7 @@
               <path d="m9 12 2 2 4-4" />
             </svg>
           </div>
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-white">XSS Protection</h2>
+          <h2 class="text-xl font-semibold">XSS Protection</h2>
         </div>
         <p class="text-secondary text-sm mb-4">
           Vue.js auto-escapes all rendered content. No v-html usage in the application.
@@ -192,7 +192,7 @@
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 class="text-lg font-semibold">
           Network Deployment Warning
         </h3>
       </div>
@@ -231,11 +231,11 @@
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Security Features</h3>
+        <h3 class="text-lg font-semibold">Security Features</h3>
       </div>
       <div class="grid md:grid-cols-3 gap-4 text-sm">
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          <p class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -266,7 +266,7 @@
           </ul>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          <p class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -289,7 +289,7 @@
           </ul>
         </div>
         <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <p class="font-medium text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+          <p class="font-medium mb-2 flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="16"
@@ -334,7 +334,7 @@
             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">When Should You Worry?</h3>
+        <h3 class="text-lg font-semibold">When Should You Worry?</h3>
       </div>
       <div class="space-y-3 text-sm">
         <div class="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
@@ -355,7 +355,7 @@
             </svg>
           </div>
           <div>
-            <p class="font-medium text-gray-900 dark:text-white">Local Development</p>
+            <p class="font-medium">Local Development</p>
             <p class="text-secondary">Default configuration is safe. No auth needed.</p>
           </div>
         </div>
@@ -378,7 +378,7 @@
             </svg>
           </div>
           <div>
-            <p class="font-medium text-gray-900 dark:text-white">Shared Computer</p>
+            <p class="font-medium">Shared Computer</p>
             <p class="text-secondary">Use OS user accounts or separate data directories.</p>
           </div>
         </div>
@@ -401,7 +401,7 @@
             </svg>
           </div>
           <div>
-            <p class="font-medium text-gray-900 dark:text-white">Public Network / Internet</p>
+            <p class="font-medium">Public Network / Internet</p>
             <p class="text-secondary">Don't expose to public networks without authentication.</p>
           </div>
         </div>
@@ -429,7 +429,7 @@
             />
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Security Tips</h3>
+        <h3 class="text-lg font-semibold">Security Tips</h3>
       </div>
       <div class="grid md:grid-cols-2 gap-4 text-sm">
         <ul class="space-y-2">

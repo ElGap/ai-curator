@@ -175,6 +175,17 @@
       </span>
     </div>
 
+    <!-- Tags -->
+    <div v-if="parsedTags.length > 0" class="flex flex-wrap gap-2 mt-3">
+      <span
+        v-for="tag in parsedTags"
+        :key="tag"
+        class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 text-xs rounded-full"
+      >
+        #{{ tag }}
+      </span>
+    </div>
+
     <!-- Delete Modal -->
     <div
       v-if="showDeleteModal"
@@ -295,8 +306,9 @@
     status: "draft" | "review" | "approved" | "rejected";
     source: string;
     model?: string;
-    createdAt: string;
-    updatedAt: string;
+    tags?: string | string[];
+    createdAt: string | number | Date;
+    updatedAt: string | number | Date;
   }
 
   const props = defineProps<{
@@ -390,8 +402,37 @@
     return difficulties[difficulty] || difficulty;
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-US", {
+  const formatDate = (date: string | number | Date) => {
+    if (!date) return "N/A";
+
+    // Handle different input types
+    let timestamp: number;
+
+    if (date instanceof Date) {
+      timestamp = date.getTime();
+    } else if (typeof date === "number") {
+      // If the number is very small (less than 10 billion), it's probably seconds
+      // Otherwise assume it's milliseconds
+      timestamp = date < 10000000000 ? date * 1000 : date;
+    } else if (typeof date === "string") {
+      // Try to parse as ISO string first
+      const parsed = Date.parse(date);
+      if (!isNaN(parsed)) {
+        timestamp = parsed;
+      } else {
+        // Try to parse as a number string
+        const num = parseInt(date, 10);
+        if (!isNaN(num)) {
+          timestamp = num < 10000000000 ? num * 1000 : num;
+        } else {
+          return "Invalid date";
+        }
+      }
+    } else {
+      return "Invalid date";
+    }
+
+    return new Date(timestamp).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -402,6 +443,22 @@
     if (text.length <= length) return text;
     return text.substring(0, length) + "...";
   };
+
+  // Parse tags from sample (handles both string JSON and array)
+  const parsedTags = computed(() => {
+    const tags = props.sample.tags;
+    if (!tags) return [];
+    if (Array.isArray(tags)) return tags;
+    if (typeof tags === "string") {
+      try {
+        const parsed = JSON.parse(tags);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  });
 
   const approveSample = async () => {
     actionLoading.value = true;
