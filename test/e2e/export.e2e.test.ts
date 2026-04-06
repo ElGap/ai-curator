@@ -7,7 +7,7 @@ import {
   cleanupIsolatedTestEnvironment,
   resetTestDatabase,
 } from "../test-env.js";
-import { getDb, resetDb } from "../../server/db/index.js";
+import { getDb, resetDb, getRawDb } from "../../server/db/index.js";
 import { samples } from "../../server/db/schema.js";
 import { eq } from "drizzle-orm";
 
@@ -41,6 +41,12 @@ describe("E2E Export Parity Tests (CLI vs API)", () => {
     resetDb();
     resetTestDatabase(testEnv.dbPath);
     resetDb();
+
+    // Run WAL checkpoint to ensure data is flushed before CLI reads it
+    const rawDb = getRawDb();
+    if (rawDb) {
+      rawDb.pragma("wal_checkpoint(TRUNCATE)");
+    }
   });
 
   describe("Database Verification", () => {

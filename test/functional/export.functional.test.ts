@@ -7,7 +7,7 @@ import {
   cleanupIsolatedTestEnvironment,
   resetTestDatabase,
 } from "../test-env.js";
-import { getDb, resetDb } from "../../server/db/index.js";
+import { getDb, resetDb, getRawDb } from "../../server/db/index.js";
 import { samples, datasets } from "../../server/db/schema.js";
 import { eq } from "drizzle-orm";
 
@@ -73,6 +73,12 @@ describe("Export CLI Functional Tests (Real CLI)", () => {
 
     for (const sample of testSamples) {
       await db.insert(samples).values(sample);
+    }
+
+    // Run WAL checkpoint to ensure data is flushed before CLI reads it
+    const rawDb = getRawDb();
+    if (rawDb) {
+      rawDb.pragma("wal_checkpoint(TRUNCATE)");
     }
 
     // Update dataset stats
