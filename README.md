@@ -398,7 +398,6 @@ curator export --dataset 1 --format mlx --output medical-training.jsonl --filter
 ### Quality Control
 
 - **Draft-first capture** — Review before including in training
-- **Duplicate detection** — Semantic similarity matching
 - **Quality ratings** — Star system for sample ranking
 - **Human-in-the-loop** — You approve every sample
 
@@ -476,12 +475,7 @@ ai-curator/
 
 ## Contributing
 
-We welcome contributions:
-
-- **Tool Integrations** — Build capture plugins for popular tools
-- **Documentation** — Tutorials, examples, translations
-- **Bug Reports** — Help us improve
-- **Feature Requests** — Suggest new capabilities
+We welcome contributions. Contributing guide will be published soon.
 
 ---
 
@@ -491,7 +485,7 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-🚧 **AI Curator is in beta (v0.3.1-beta)** — We follow the #rapidMvpMindset, shipping fast and iterating regularly. Expect frequent updates and improvements!
+**AI Curator is in beta (v0.3.2-beta)** — We follow the #rapidMvpMindset, shipping fast and iterating regularly. Expect frequent updates and improvements!
 
 ---
 

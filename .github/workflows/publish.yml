@@ -25,6 +25,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Nuxt types
+        run: npx nuxt prepare
+
       - name: Run linter
         run: npm run lint
 
