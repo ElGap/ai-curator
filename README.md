@@ -16,16 +16,16 @@
 
 **Main Features:**
 
-- **🔒 Privacy First** — Local SQLite database. No cloud, no tracking, no telemetry.
-- **🚫 No Code** — Point, click, curate. No programming required.
-- **⚡ Zero Configuration** — Install and run. Start collecting in minutes.
-- **🎓 EdukaAI Starter Pack included** - Start training in 5 minutes with 75 premium samples
+- **Privacy First** — Local SQLite database. No cloud, no tracking, no telemetry.
+- **No Code** — Point, click, curate. No programming required.
+- **Zero Configuration** — Install and run. Start collecting in minutes.
+- **EdukaAI Starter Pack included** - Start training in 5 minutes with 75 premium samples
 
 **Three ways to work:**
 
-- 🖱️ **Intuitive Web UI** — Point, click, curate. Perfect for beginners.
-- ⚡ **Powerful CLI** — Automate, script, and integrate. Built for professionals.
-- 🎯 **Live Capture API** — Real-time data streaming from any tool, IDE, or script. Our most powerful feature.
+- **Intuitive Web UI** — Point, click, curate. Perfect for beginners.
+- *Powerful CLI** — Automate, script, and integrate. Built for professionals.
+- **Live Capture API** — Real-time data streaming from any tool, IDE, or script. Our most powerful feature.
 
 ## Why AI Curator?
 
@@ -136,11 +136,11 @@ curator import EdukaAISP/default-dataset.json --dataset 2 --status approved
 
 A curated collection of immersive football training data from the Kingston United vs. Newport County thriller:
 
-- ⚽ **Player roleplays** — Be Chen Wei, Diego Rodriguez, or Marco Esposito
-- 📊 **Tactical analysis** — Deep match breakdowns and formation analysis
-- 🎤 **Fan perspectives** — Emotional reactions from both home and away supporters
-- 📖 **Commentary transcripts** — Professional match narration
-- 🔮 **Alternate history** — "What if" scenarios exploring different outcomes
+- **Player roleplays** — Be Chen Wei, Diego Rodriguez, or Marco Esposito
+- **Tactical analysis** — Deep match breakdowns and formation analysis
+- **Fan perspectives** — Emotional reactions from both home and away supporters
+- **Commentary transcripts** — Professional match narration
+- **Alternate history** — "What if" scenarios exploring different outcomes
 
 **Export for training:**
 
