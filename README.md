@@ -62,9 +62,9 @@ Start fine-tuning in 5 minutes with no configuration:
 
 ## Quick Start
 
-### One-Command Installer (macOS & Linux)
+### One-Command Installer (macOS & Linux) ✅ Recommended
 
-The easiest way to install AI Curator if you have Git installed:
+The easiest and most reliable way to install AI Curator:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash
@@ -73,40 +73,25 @@ curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | 
 This will:
 
 1. Check and install Node.js 20+ if needed
-2. Download AI Curator
-3. Install all dependencies
+2. Download AI Curator to your current directory
+3. Install all dependencies (with correct native binaries for your platform)
 4. Build the application
-5. Create launch shortcuts
+5. Add `curator` command to your PATH
+6. Import the EdukaAI Starter Pack (75 samples ready to use)
 
-After installation, run:
-
-```bash
-cd ai-curator
-./launch.sh
-```
-
-### NPM (Alternative)
+After installation, simply run:
 
 ```bash
-# One-time use
-npx @elgap/ai-curator
-```
-
-```bash
-# Or install globally
-npm install -g @elgap/ai-curator
-
-# Reset database to create default datasets
-curator reset --force
-
-# Import the EdukaAI Starter Pack (75 samples for beginners)
-curator import EdukaAISP/default-dataset.json --dataset 2 --status approved
-
-# Start the server
 curator
 ```
 
-Open [http://localhost:3333](http://localhost:3333) and start capturing.
+Or if you prefer:
+
+```bash
+./curator
+```
+
+> **⚠️ Note:** `npm install -g` and `npx` are temporarily unavailable due to platform-specific binary compilation issues. The install script above is the recommended method and works perfectly on all platforms. Global npm support will be restored in a future release.
 
 ---
 
