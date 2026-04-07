@@ -19,6 +19,24 @@ export default defineNuxtConfig({
     experimental: {
       wasm: true,
     },
+    // Externalize native dependencies - let npm handle platform-specific binaries
+    externals: {
+      external: [
+        "better-sqlite3",
+        "bindings",
+        "file-uri-to-path",
+        "prebuild-install",
+        "napi-build-utils",
+        "node-gyp",
+        "tar",
+        "rc",
+        "pump",
+        "simple-get",
+        "which-pm-runs",
+        "expand-template",
+        "github-from-package",
+      ],
+    },
     routeRules: {
       // Security: Limit request body sizes to prevent DoS
       "/api/import/**": {

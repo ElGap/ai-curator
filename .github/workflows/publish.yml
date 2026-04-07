@@ -57,12 +57,8 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Remove platform-specific binaries
-        run: |
-          # Remove better-sqlite3 prebuilt binaries - they'll be rebuilt on user's machine
-          find .output -name "*.node" -type f -delete 2>/dev/null || true
-          find .output -path "*/better-sqlite3/build/*" -type d -exec rm -rf {} + 2>/dev/null || true
-          echo "✅ Removed platform-specific binaries"
+      # Note: Native dependencies are now externalized in nuxt.config.ts
+      # better-sqlite3 will be installed by npm on user's machine with correct platform binary
 
       - name: Verify build output
         run: |
