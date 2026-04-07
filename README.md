@@ -24,7 +24,7 @@
 **Three ways to work:**
 
 - **Intuitive Web UI** — Point, click, curate. Perfect for beginners.
-- *Powerful CLI** — Automate, script, and integrate. Built for professionals.
+- \*Powerful CLI\*\* — Automate, script, and integrate. Built for professionals.
 - **Live Capture API** — Real-time data streaming from any tool, IDE, or script. Our most powerful feature.
 
 ## Why AI Curator?
