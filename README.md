@@ -485,8 +485,6 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-**AI Curator is in beta (v0.3.2-beta)** — We follow the #rapidMvpMindset, shipping fast and iterating regularly. Expect frequent updates and improvements!
-
----
-
 [AI Curator](https://github.com/elgap/ai-curator) and [EdukaAI Studio](https://github.com/elgap/edukaai-studio) are part of the [EdukaAI](https://eduka.elgap.ai) project by ElGap — making AI fine-tuning accessible through open-source, privacy-first, no-code tools.
+
+We follow the [#rapidMvpMindset](https://elgap.rs/rapid-mvp-mindset), shipping fast and iterating regularly. Expect frequent updates and improvements!
