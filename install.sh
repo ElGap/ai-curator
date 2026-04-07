@@ -19,6 +19,17 @@ AUTO_YES=false
 INSTALL_NODE=false
 INSTALL_DIR=""
 
+# Get version from package.json if available (for developer mode)
+# Otherwise use a default version
+get_version() {
+    if [ -f "package.json" ]; then
+        # Extract version from package.json using grep/sed (no Node.js required yet)
+        grep -o '"version": *"[^"]*"' package.json | sed 's/.*"\([^"]*\)".*/\1/' | head -1
+    else
+        echo "0.3.2-beta"
+    fi
+}
+
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
@@ -302,39 +313,50 @@ setup_installation_directory() {
     echo "Setting up installation directory..."
     
     if [ "$MODE" = "user" ]; then
-        # Install in current directory
+        # Install in current directory (Solution D)
         INSTALL_DIR="$(pwd)"
         
-        # Check if directory is not empty
-        if [ "$(ls -A 2>/dev/null)" ]; then
-            echo "Installing in: $INSTALL_DIR"
-            echo "Note: Directory is not empty, files will be added"
+        echo "Installing to: $INSTALL_DIR"
+        echo ""
+        
+        # Safety check: warn if directory is not empty and contains non-curator files
+        if [ "$(ls -A 2>/dev/null | grep -v "^ai-curator$" | grep -v "^\\." | head -1)" ]; then
+            echo "⚠️  Warning: Current directory is not empty"
+            echo "   Files will be added to: $INSTALL_DIR"
             echo ""
+            
+            if [ "$AUTO_YES" = false ]; then
+                read_tty -p "Continue with installation here? (Y/n) " -n 1 -r
+                echo
+                if [[ ! $REPLY =~ ^[Yy]$ ]] && [ -n "$REPLY" ]; then
+                    echo "Installation cancelled. Please create an empty directory and try again:"
+                    echo "  mkdir ~/ai-curator && cd ~/ai-curator"
+                    echo "  curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash"
+                    exit 0
+                fi
+            fi
         fi
         
-        # Clone repository
+        # Clone repository into temp location first, then move files
         echo "Downloading AI Curator..."
-        echo "Installing to: $INSTALL_DIR/ai-curator"
         
-        if [ -d "ai-curator" ]; then
-            echo "Directory 'ai-curator' already exists"
-            echo "Updating existing installation..."
-            cd ai-curator
-            git pull origin main || {
-                echo "Warning: Could not update, continuing with existing version"
-            }
-        else
-            git clone --depth 1 "$REPO_URL.git" ai-curator || {
-                echo "Error: Failed to download AI Curator"
-                exit 1
-            }
-            cd ai-curator
-        fi
+        TEMP_DIR=$(mktemp -d)
+        git clone --depth 1 "$REPO_URL.git" "$TEMP_DIR" || {
+            echo "Error: Failed to download AI Curator"
+            rm -rf "$TEMP_DIR"
+            exit 1
+        }
         
-        INSTALL_DIR="$(pwd)"
+        # Move files from temp to current directory
+        echo "Extracting files to current directory..."
+        shopt -s dotglob 2>/dev/null || true
+        mv "$TEMP_DIR"/* "$INSTALL_DIR"/ 2>/dev/null || true
+        mv "$TEMP_DIR"/.* "$INSTALL_DIR"/ 2>/dev/null || true
+        rm -rf "$TEMP_DIR"
+        
         echo "Downloaded successfully"
     else
-        # Developer mode
+        # Developer mode - use current directory
         INSTALL_DIR="$(pwd)"
         echo "Developer mode. Installing in: $INSTALL_DIR"
     fi
@@ -384,29 +406,33 @@ build_application() {
     echo "Build complete ✓"
 }
 
-create_launch_script() {
+create_curator_wrapper() {
     echo ""
-    echo "Creating launch script..."
+    echo "Creating curator command..."
     
-    cat > launch.sh << 'EOF'
+    # Create a wrapper script that can be called as 'curator'
+    cat > curator << 'WRAPPER_EOF'
 #!/bin/bash
-# AI Curator Launcher
+# AI Curator CLI Wrapper
+# Installed at: INSTALL_DIR_PLACEHOLDER
 
-set -e
+INSTALL_DIR="INSTALL_DIR_PLACEHOLDER"
 
-INSTALL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$INSTALL_DIR"
+if [ ! -f "$INSTALL_DIR/dist/curator.mjs" ]; then
+    echo "Error: AI Curator not found at $INSTALL_DIR"
+    echo "Please reinstall: curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash"
+    exit 1
+fi
 
-echo "🎨 Starting AI Curator..."
-echo "   Open http://localhost:3333 in your browser"
-echo "   Press Ctrl+C to stop"
-echo ""
-
-node dist/curator.mjs "$@"
-EOF
+node "$INSTALL_DIR/dist/curator.mjs" "$@"
+WRAPPER_EOF
     
-    chmod +x launch.sh
-    echo "Created: launch.sh"
+    # Replace placeholder with actual path
+    sed -i.bak "s|INSTALL_DIR_PLACEHOLDER|$INSTALL_DIR|g" curator
+    rm -f curator.bak
+    
+    chmod +x curator
+    echo "Created: curator (CLI wrapper)"
 }
 
 create_desktop_shortcut() {
@@ -418,7 +444,7 @@ create_desktop_shortcut() {
         cat > "$desktop_link" << EOF
 #!/bin/bash
 cd "$INSTALL_DIR"
-./launch.sh
+./curator
 EOF
         chmod +x "$desktop_link"
         echo "Created Desktop shortcut: ~/Desktop/AI-Curator.command"
@@ -435,23 +461,45 @@ add_to_path() {
             shell_rc="$HOME/.zshrc"
         elif [ -f "$HOME/.bashrc" ]; then
             shell_rc="$HOME/.bashrc"
+        elif [ -f "$HOME/.bash_profile" ]; then
+            shell_rc="$HOME/.bash_profile"
         fi
         
         if [ -n "$shell_rc" ]; then
             # Check if already in PATH
-            if ! grep -q "ai-curator/bin" "$shell_rc" 2>/dev/null; then
-                echo "export PATH=\"$INSTALL_DIR/bin:\$PATH\"" >> "$shell_rc"
+            if ! grep -q "^export PATH=.*$INSTALL_DIR" "$shell_rc" 2>/dev/null; then
+                echo "" >> "$shell_rc"
+                echo "# AI Curator" >> "$shell_rc"
+                echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$shell_rc"
                 echo "Added to PATH in $shell_rc"
-                echo "Run 'source $shell_rc' to update your current terminal"
             else
                 echo "Already in PATH ✓"
             fi
         else
             echo "Could not detect shell config file"
             echo "Add this to your shell config:"
-            echo "  export PATH=\"$INSTALL_DIR/bin:\$PATH\""
+            echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
         fi
+        
+        echo ""
+        echo "For current session, run:"
+        echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
     fi
+}
+
+make_available_now() {
+    # Make curator available immediately in current session
+    echo ""
+    echo "Making curator available now..."
+    
+    # Export PATH for current session (only works in current shell process)
+    export PATH="$INSTALL_DIR:$PATH"
+    
+    echo "✅ curator is now available in this session"
+    echo "   Try: curator --help"
+    echo ""
+    echo "💡 For new terminal windows, the 'curator' command will be available automatically."
+    echo "   PATH has been added to your shell configuration."
 }
 
 # ============================================================================
@@ -485,12 +533,13 @@ main() {
     # Detect mode
     MODE=$(detect_mode)
     OS=$(detect_os)
+    VERSION=$(get_version)
     
     # Header
     echo ""
     echo "╔════════════════════════════════════════════════════╗"
     echo "║          AI Curator Installer                      ║"
-    echo "║          Version 0.3.0-beta                        ║"
+    printf "║          Version %-33s║\n" "$VERSION"
     echo "╚════════════════════════════════════════════════════╝"
     echo ""
     echo "Mode: $MODE"
@@ -547,9 +596,9 @@ main() {
         LICENSE=$(node -e "console.log(require('./datasets/starter-pack/metadata.json').license || 'CC-BY-4.0')")
         
         # Initialize database first (creates the datasets)
-        node dist/curator.mjs reset --force >/dev/null 2>&1 || true
+        ./curator reset --force >/dev/null 2>&1 || true
         # Import the starter pack
-        if node dist/curator.mjs import "datasets/starter-pack/samples.json" --dataset 2 --status approved --workers 4 2>&1 | grep -q "Import complete"; then
+        if ./curator import "datasets/starter-pack/samples.json" --dataset 2 --status approved --workers 4 2>&1 | grep -q "Import complete"; then
             echo "   ✅ $TOTAL_SAMPLES premium samples loaded and ready!"
             echo "      Dataset: $DATASET_NAME"
             echo "      Author: $AUTHOR"
@@ -562,30 +611,27 @@ main() {
         echo "   ⚠️  Starter pack not found, but you can still use AI Curator with your own data"
     fi
     
-    create_launch_script
-    create_desktop_shortcut
+    create_curator_wrapper
     add_to_path
+    make_available_now
     
     # Completion
     echo ""
     echo "╔════════════════════════════════════════════════════╗"
-    echo "║          Installation Complete!                    ║"
+    echo "║          Installation Complete!                  ║"
     echo "╚════════════════════════════════════════════════════╝"
     echo ""
     
     if [ "$MODE" = "user" ]; then
         echo "Installation location: $INSTALL_DIR"
         echo ""
-        echo "To start AI Curator:"
-        echo "   cd $INSTALL_DIR"
-        echo "   ./launch.sh"
+        echo "✅ The 'curator' command is now available!"
         echo ""
-        
-        if [ "$OS" = "macos" ]; then
-            echo "Or double-click 'AI-Curator.command' on your Desktop"
-            echo ""
-        fi
-        
+        echo "Quick commands:"
+        echo "   curator --help          Show all available commands"
+        echo "   curator                 Start the web UI"
+        echo "   curator export --help   Learn about exporting datasets"
+        echo ""
         echo "Once running, open: http://localhost:3333"
         echo ""
         echo "🚀 Quick Start Options:"
@@ -614,22 +660,23 @@ main() {
                 echo ""
                 echo "Launching AI Curator..."
                 sleep 2
-                ./launch.sh
+                curator
             fi
         else
             echo ""
             echo "To start AI Curator, run:"
-            echo "  cd $INSTALL_DIR && ./launch.sh"
+            echo "  curator"
         fi
     else
         # Developer mode
         echo "Installation complete in: $INSTALL_DIR"
         echo ""
-        echo "To start AI Curator:"
-        echo "   npm run dev           # Development mode"
-        echo "   ./launch.sh           # Production mode"
+        echo "The 'curator' command is available:"
+        echo "   curator --help        Show CLI help"
+        echo "   curator               Start server"
+        echo "   npm run dev           Development mode"
         echo ""
-        echo "Or run CLI commands:"
+        echo "Or run directly:"
         echo "   node dist/curator.mjs --help"
     fi
 }

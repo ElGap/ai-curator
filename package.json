@@ -1,6 +1,6 @@
 {
   "name": "@elgap/ai-curator",
-  "version": "0.3.1-beta",
+  "version": "0.3.2-beta",
   "description": "AI Curator - Privacy-first dataset curation for LLM fine-tuning",
   "author": "Ivan Pavkovic",
   "license": "MIT",
@@ -15,6 +15,7 @@
     "dist/",
     "bin/",
     "datasets/",
+    "scripts/postinstall.js",
     "install.sh",
     "README.md",
     "LICENSE"
@@ -27,7 +28,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare || true",
+    "postinstall": "node scripts/postinstall.js || nuxt prepare || true",
     "prepublishOnly": "npm run build && node scripts/bundle-cli.cjs",
     "db:generate": "drizzle-kit generate:sqlite",
     "db:migrate": "drizzle-kit migrate",

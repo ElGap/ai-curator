@@ -1,0 +1,4 @@
+# Don't include better-sqlite3 prebuilt binaries - rebuild on install
+.output/server/node_modules/better-sqlite3/build/
+node_modules/better-sqlite3/build/
+**/*.node
