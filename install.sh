@@ -321,7 +321,7 @@ setup_installation_directory() {
         
         # Safety check: warn if directory is not empty and contains non-curator files
         if [ "$(ls -A 2>/dev/null | grep -v "^ai-curator$" | grep -v "^\\." | head -1)" ]; then
-            echo "⚠️  Warning: Current directory is not empty"
+            echo "Warning: Current directory is not empty"
             echo "   Files will be added to: $INSTALL_DIR"
             echo ""
             
@@ -495,11 +495,11 @@ make_available_now() {
     # Export PATH for current session (only works in current shell process)
     export PATH="$INSTALL_DIR:$PATH"
     
-    echo "✅ curator is now available in this session"
-    echo "   Try: curator --help"
+    echo "  curator is now available in this session"
+    echo "  Try: curator --help"
     echo ""
-    echo "💡 For new terminal windows, the 'curator' command will be available automatically."
-    echo "   PATH has been added to your shell configuration."
+    echo "  For new terminal windows, the 'curator' command will be available automatically."
+    echo "  PATH has been added to your shell configuration."
 }
 
 # ============================================================================
@@ -586,7 +586,7 @@ main() {
     
     # Import EdukaAI Starter Pack (75 premium samples)
     echo ""
-    echo "📦 Importing EdukaAI Starter Pack..."
+    echo "Importing EdukaAI Starter Pack..."
     if [ -f "$INSTALL_DIR/datasets/starter-pack/metadata.json" ]; then
         cd "$INSTALL_DIR"
         # Read metadata
@@ -599,16 +599,16 @@ main() {
         ./curator reset --force >/dev/null 2>&1 || true
         # Import the starter pack
         if ./curator import "datasets/starter-pack/samples.json" --dataset 2 --status approved --workers 4 2>&1 | grep -q "Import complete"; then
-            echo "   ✅ $TOTAL_SAMPLES premium samples loaded and ready!"
+            echo "   $TOTAL_SAMPLES premium samples loaded and ready!"
             echo "      Dataset: $DATASET_NAME"
             echo "      Author: $AUTHOR"
             echo "      License: $LICENSE"
         else
-            echo "   ⚠️  Starter pack import may have failed, but you can import manually later:"
+            echo "   Starter pack import may have failed, but you can import manually later:"
             echo "      curator import datasets/starter-pack/samples.json --dataset 2 --status approved"
         fi
     else
-        echo "   ⚠️  Starter pack not found, but you can still use AI Curator with your own data"
+        echo "   Starter pack not found, but you can still use AI Curator with your own data"
     fi
     
     create_curator_wrapper
@@ -618,14 +618,14 @@ main() {
     # Completion
     echo ""
     echo "╔════════════════════════════════════════════════════╗"
-    echo "║          Installation Complete!                  ║"
+    echo "║          Installation Complete!                    ║"
     echo "╚════════════════════════════════════════════════════╝"
     echo ""
     
     if [ "$MODE" = "user" ]; then
         echo "Installation location: $INSTALL_DIR"
         echo ""
-        echo "✅ The 'curator' command is now available!"
+        echo "The 'curator' command is now available!"
         echo ""
         echo "Quick commands:"
         echo "   curator --help          Show all available commands"
@@ -634,7 +634,7 @@ main() {
         echo ""
         echo "Once running, open: http://localhost:3333"
         echo ""
-        echo "🚀 Quick Start Options:"
+        echo "Quick Start Options:"
         echo ""
         echo "   Option 1: Train immediately (5 minutes!)"
         echo "      The EdukaAI Starter Pack is already imported with 75 samples:"
