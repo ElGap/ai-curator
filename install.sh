@@ -539,7 +539,6 @@ main() {
     echo ""
     echo "╔════════════════════════════════════════════════════╗"
     echo "║          AI Curator Installer                      ║"
-    printf "║          Version %-33s║\n" "$VERSION"
     echo "╚════════════════════════════════════════════════════╝"
     echo ""
     echo "Mode: $MODE"
