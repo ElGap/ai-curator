@@ -205,18 +205,23 @@ jobs:
         with:
           path: ./binaries
           pattern: curator-*
+          merge-multiple: true
 
       - name: Display structure
-        run: ls -la ./binaries/
+        run: |
+          echo "=== Directory structure ==="
+          ls -laR ./binaries/
+          echo "=== Flatten if needed ==="
+          find ./binaries -type f -name "curator-*" | head -20
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', github.event.inputs.version) || github.ref_name }}
           name: Release ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') || github.event.inputs.version != '' && (contains(github.event.inputs.version, 'beta') || contains(github.event.inputs.version, 'alpha')) }}
-          files: ./binaries/**/*
+          files: ./binaries/curator-*
           body: |
             ## AI Curator ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}
 

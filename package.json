@@ -1,6 +1,6 @@
 {
   "name": "@elgap/ai-curator",
-  "version": "0.4.1-beta",
+  "version": "0.4.2",
   "description": "AI Curator - Privacy-first dataset curation for LLM fine-tuning",
   "author": "ElGap",
   "license": "MIT",
