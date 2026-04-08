@@ -541,7 +541,6 @@
 
     loadingStats.value = true;
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const response: any = await $fetch(`/api/datasets/${selectedDataset.value}/stats`);
       stats.value = {
         total: response?.total || 0,
