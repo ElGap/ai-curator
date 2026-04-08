@@ -27,10 +27,33 @@ export default defineNuxtConfig({
     },
     externals: {
       external: ["bun:sqlite"],
+      inline: ["drizzle-orm/better-sqlite3"],
     },
     alias: {
       "bun:sqlite": "better-sqlite3",
       "drizzle-orm/bun-sqlite": "drizzle-orm/better-sqlite3",
+    },
+    hooks: {
+      compiled: async (nitro) => {
+        // Copy drizzle-orm modules to output
+        const fs = await import("node:fs");
+        const path = await import("node:path");
+
+        const modulesToCopy = ["drizzle-orm/better-sqlite3", "drizzle-orm/cache"];
+
+        for (const moduleName of modulesToCopy) {
+          const srcDir = path.resolve(`./node_modules/${moduleName}`);
+          const destDir = path.resolve(
+            nitro.options.output.serverDir,
+            `node_modules/${moduleName}`
+          );
+          if (fs.existsSync(srcDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+            fs.cpSync(srcDir, destDir, { recursive: true });
+            console.log(`✅ Copied ${moduleName} to output`);
+          }
+        }
+      },
     },
     routeRules: {
       // Security: Limit request body sizes to prevent DoS

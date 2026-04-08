@@ -1,0 +1,297 @@
+name: Build Release Binaries
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build (e.g., 0.4.0)"
+        required: true
+        type: string
+
+jobs:
+  build-macos-arm64:
+    name: Build macOS ARM64
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build binary
+        run: |
+          mkdir -p dist
+          bun build --compile --target=bun-darwin-arm64 ./bin/cli.js --outfile "dist/curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64"
+
+      - name: Generate checksum
+        run: |
+          cd dist
+          shasum -a 256 "curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64" > "curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.sha256"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64
+          path: dist/*
+
+  build-macos-x64:
+    name: Build macOS x64
+    runs-on: macos-13
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build binary
+        run: |
+          mkdir -p dist
+          bun build --compile --target=bun-darwin-x64 ./bin/cli.js --outfile "dist/curator-${{ steps.get_version.outputs.VERSION }}-darwin-x64"
+
+      - name: Generate checksum
+        run: |
+          cd dist
+          shasum -a 256 "curator-${{ steps.get_version.outputs.VERSION }}-darwin-x64" > "curator-${{ steps.get_version.outputs.VERSION }}-darwin-x64.sha256"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-x64
+          path: dist/*
+
+  build-linux-x64:
+    name: Build Linux x64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build binary
+        run: |
+          mkdir -p dist
+          bun build --compile --target=bun-linux-x64 ./bin/cli.js --outfile "dist/curator-${{ steps.get_version.outputs.VERSION }}-linux-x64"
+
+      - name: Generate checksum
+        run: |
+          cd dist
+          sha256sum "curator-${{ steps.get_version.outputs.VERSION }}-linux-x64" > "curator-${{ steps.get_version.outputs.VERSION }}-linux-x64.sha256"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-x64
+          path: dist/*
+
+  release:
+    name: Create Release
+    needs: [build-macos-arm64, build-macos-x64, build-linux-x64]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: "*"
+          merge-multiple: true
+
+      - name: List artifacts
+        run: |
+          echo "📦 Release artifacts:"
+          ls -lh dist/
+
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create/update GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event_name == 'workflow_dispatch' && format('v{0}', github.event.inputs.version) || github.ref_name }}
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') || github.event.inputs.version != '' && contains(github.event.inputs.version, 'beta') || contains(github.event.inputs.version, 'alpha') }}
+          files: dist/*
+          body: |
+            ## AI Curator ${{ steps.get_version.outputs.VERSION }}
+
+            **Local-first dataset curation for LLM fine-tuning**
+
+            ### Homebrew Installation (Recommended)
+
+            ```bash
+            brew tap elgap/tap
+            brew install ai-curator
+            ```
+
+            ### Binary Installation
+
+            Download the appropriate binary for your platform:
+
+            - **macOS (Apple Silicon)**: `curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64`
+            - **macOS (Intel)**: `curator-${{ steps.get_version.outputs.VERSION }}-darwin-x64`
+            - **Linux (x64)**: `curator-${{ steps.get_version.outputs.VERSION }}-linux-x64`
+
+            ```bash
+            # Example for macOS ARM64
+            curl -L -o curator https://github.com/elgap/ai-curator/releases/download/v${{ steps.get_version.outputs.VERSION }}/curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64
+            chmod +x curator
+            sudo mv curator /usr/local/bin/
+            ```
+
+            ### NPM Installation
+
+            ```bash
+            npm install -g @elgap/ai-curator@${{ steps.get_version.outputs.VERSION }}
+            ```
+
+            ### Quick Start
+
+            ```bash
+            curator
+            # Open http://localhost:3333
+            ```
+
+            ### Checksums
+
+            | Platform | SHA256 |
+            |----------|--------|
+            | macOS ARM64 | See `curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.sha256` |
+            | macOS x64 | See `curator-${{ steps.get_version.outputs.VERSION }}-darwin-x64.sha256` |
+            | Linux x64 | See `curator-${{ steps.get_version.outputs.VERSION }}-linux-x64.sha256` |
+
+            ### Links
+
+            - [Full Documentation](https://edukaai.elgap.ai)
+            - [npm Package](https://www.npmjs.com/package/@elgap/ai-curator)
+            - [GitHub Repository](https://github.com/elgap/ai-curator)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-homebrew-formula:
+    name: Update Homebrew Formula
+    needs: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get version
+        id: get_version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Download release artifacts
+        run: |
+          mkdir -p dist
+          cd dist
+          curl -L -o curator-darwin-arm64 "https://github.com/elgap/ai-curator/releases/download/v${{ steps.get_version.outputs.VERSION }}/curator-${{ steps.get_version.outputs.VERSION }}-darwin-arm64"
+          curl -L -o curator-darwin-x64 "https://github.com/elgap/ai-curator/releases/download/v${{ steps.get_version.outputs.VERSION }}/curator-${{ steps.get_version.outputs.VERSION }}-darwin-x64"
+          curl -L -o curator-linux-x64 "https://github.com/elgap/ai-curator/releases/download/v${{ steps.get_version.outputs.VERSION }}/curator-${{ steps.get_version.outputs.VERSION }}-linux-x64"
+
+      - name: Generate SHA256 checksums
+        id: checksums
+        run: |
+          cd dist
+          echo "DARWIN_ARM64_SHA=$(sha256sum curator-darwin-arm64 | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          echo "DARWIN_X64_SHA=$(sha256sum curator-darwin-x64 | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+          echo "LINUX_X64_SHA=$(sha256sum curator-linux-x64 | cut -d' ' -f1)" >> $GITHUB_OUTPUT
+
+      - name: Checkout homebrew-tap repository
+        uses: actions/checkout@v4
+        with:
+          repository: elgap/homebrew-tap
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          path: homebrew-tap
+
+      - name: Update formula
+        run: |
+          cat > homebrew-tap/Formula/ai-curator.rb << 'EOF'
+          class AiCurator < Formula
+            desc "Privacy-first dataset curation for LLM fine-tuning"
+            homepage "https://github.com/elgap/ai-curator"
+            version "${{ steps.get_version.outputs.VERSION }}"
+            
+            on_macos do
+              on_arm do
+                url "https://github.com/elgap/ai-curator/releases/download/v#{version}/curator-#{version}-darwin-arm64"
+                sha256 "${{ steps.checksums.outputs.DARWIN_ARM64_SHA }}"
+              end
+              on_intel do
+                url "https://github.com/elgap/ai-curator/releases/download/v#{version}/curator-#{version}-darwin-x64"
+                sha256 "${{ steps.checksums.outputs.DARWIN_X64_SHA }}"
+              end
+            end
+            
+            on_linux do
+              url "https://github.com/elgap/ai-curator/releases/download/v#{version}/curator-#{version}-linux-x64"
+              sha256 "${{ steps.checksums.outputs.LINUX_X64_SHA }}"
+            end
+            
+            def install
+              bin.install "curator-#{version}-#{OS.kernel_name.downcase}-#{Hardware::CPU.arch}" => "curator"
+            end
+            
+            test do
+              system "#{bin}/curator", "--version"
+            end
+          end
+          EOF
+
+      - name: Commit and push formula update
+        run: |
+          cd homebrew-tap
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add Formula/ai-curator.rb
+          git commit -m "Update ai-curator to ${{ steps.get_version.outputs.VERSION }}"
+          git push

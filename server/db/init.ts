@@ -1,6 +1,9 @@
 // Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
 // Module name obfuscated to prevent static analysis
-const _bunMod = typeof Bun !== 'undefined' ? [98,117,110,58,115,113,108,105,116,101].map(c => String.fromCharCode(c)).join('') : 'better-sqlite3';
+const _bunMod =
+  typeof Bun !== "undefined"
+    ? [98, 117, 110, 58, 115, 113, 108, 105, 116, 101].map((c) => String.fromCharCode(c)).join("")
+    : "better-sqlite3";
 const Database = (await import(_bunMod)).default || (await import(_bunMod)).Database;
 
 const sqlite = new Database("./data/curator.db");

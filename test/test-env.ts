@@ -12,7 +12,7 @@ import { mkdirSync, rmSync, existsSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 // bun:sqlite is aliased to better-sqlite3 via vitest.config.ts for Node.js test env
-import { Database } from 'bun:sqlite';
+import { Database } from "bun:sqlite";
 
 /**
  * Create a fresh test environment for the current test file

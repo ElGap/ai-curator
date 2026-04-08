@@ -130,6 +130,11 @@ async function main() {
     case "-h":
       showHelp();
       break;
+    case "version":
+    case "--version":
+    case "-v":
+      showVersion();
+      break;
     default:
       // No command - start the server (default behavior)
       startServer();
@@ -1162,6 +1167,19 @@ Examples:
 
 For more information, visit: https://github.com/elgap/ai-curator
 `);
+}
+
+function showVersion() {
+  // Read version from package.json
+  try {
+    const packageJsonPath = path.join(packageRoot, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
+    console.log(`AI Curator v${packageJson.version}`);
+    console.log(`Homepage: ${packageJson.homepage || "https://github.com/elgap/ai-curator"}`);
+  } catch (error) {
+    console.log("AI Curator (version unknown)");
+  }
+  process.exit(0);
 }
 
 async function handleSearch(args) {

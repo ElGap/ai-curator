@@ -62,9 +62,24 @@ Start fine-tuning in 5 minutes with no configuration:
 
 ## Quick Start
 
-### One-Command Installer (macOS & Linux) ✅ Recommended
+### Homebrew (macOS & Linux) ✅ Recommended
 
-The easiest and most reliable way to install AI Curator:
+The fastest way to install AI Curator with automatic updates:
+
+```bash
+brew tap elgap/tap
+brew install ai-curator
+```
+
+The `curator` command will be available globally. Simply run:
+
+```bash
+curator
+```
+
+### Install Script (macOS & Linux)
+
+Universal installer that works on all platforms and architectures:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash
@@ -90,8 +105,6 @@ Or if you prefer:
 ```bash
 ./curator
 ```
-
-> **⚠️ Note:** `npm install -g` and `npx` are temporarily unavailable due to platform-specific binary compilation issues. The install script above is the recommended method and works perfectly on all platforms. Global npm support will be restored in a future release.
 
 ---
 
