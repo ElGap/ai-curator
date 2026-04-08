@@ -2,7 +2,11 @@
 // Main import command implementation using direct SQLite
 
 import { existsSync, writeFileSync } from "fs";
-import Database from "better-sqlite3";
+// Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
+const _sqliteModName = typeof Bun !== 'undefined' 
+  ? [98,117,110,58,115,113,108,105,116,101].map(c => String.fromCharCode(c)).join('')
+  : 'better-sqlite3';
+const { Database } = await import(_sqliteModName).then(m => m.default ? { Database: m.default } : m);
 import { createParser } from "./parsers/index.js";
 import { fileURLToPath } from "url";
 import { dirname, join, resolve } from "path";
@@ -72,8 +76,7 @@ export class ImportCommand {
       const dbPath = resolveDatabasePath(this.options.dataDir);
       this.db = new Database(dbPath);
 
-      // Enable WAL mode for better performance
-      this.db.pragma("journal_mode = WAL");
+      this.db.exec("PRAGMA journal_mode = WAL");
 
       // Validate or get dataset
       const dataset = this.getOrValidateDataset();

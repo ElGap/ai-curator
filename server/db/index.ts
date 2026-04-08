@@ -1,5 +1,14 @@
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+// Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
+// Module name obfuscated to prevent static analysis from resolving bun:sqlite
+const _bunMod =
+  typeof Bun !== "undefined"
+    ? [98, 117, 110, 58, 115, 113, 108, 105, 116, 101].map((c) => String.fromCharCode(c)).join("")
+    : "better-sqlite3";
+const _drizzleMod =
+  typeof Bun !== "undefined" ? "drizzle-orm/bun-sqlite" : "drizzle-orm/better-sqlite3";
+const BunDatabase = (await import(_bunMod)).default || (await import(_bunMod)).Database;
+const drizzle = (await import(_drizzleMod)).drizzle;
+
 import * as schema from "./schema.ts";
 import path from "path";
 import fs from "fs";
@@ -10,7 +19,7 @@ export type Schema = typeof schema;
 export type DatabaseClient = ReturnType<typeof drizzle<Schema>>;
 
 let db: DatabaseClient | null = null;
-let rawDb: Database.Database | null = null;
+let rawDb: InstanceType<typeof BunDatabase> | null = null;
 let initialized = false;
 let currentDbPath: string | null = null;
 
@@ -34,7 +43,7 @@ export function resetDb(): void {
   currentDbPath = null;
 }
 
-function initDatabase(sqlite: Database.Database) {
+function initDatabase(sqlite: InstanceType<typeof BunDatabase>) {
   if (initialized) return;
 
   // Clean slate: Check if schema is complete
@@ -483,7 +492,7 @@ export function getDb(): DatabaseClient {
       fs.mkdirSync(dataDir, { recursive: true });
     }
 
-    const sqlite = new Database(dbPath);
+    const sqlite = new BunDatabase(dbPath);
 
     // Only use WAL mode for production database, not for tests
     // Tests use isolated temp databases that need DELETE mode for proper subprocess synchronization
@@ -493,7 +502,7 @@ export function getDb(): DatabaseClient {
       dbPath.includes("TEMPDIR") ||
       dbPath.includes("tmpdir");
     if (!isTestDb) {
-      sqlite.pragma("journal_mode = WAL");
+      sqlite.exec("PRAGMA journal_mode = WAL");
     }
 
     initDatabase(sqlite);
@@ -506,7 +515,7 @@ export function getDb(): DatabaseClient {
 }
 
 // Get raw SQLite instance for PRAGMA operations
-export function getRawDb(): Database.Database | null {
+export function getRawDb(): InstanceType<typeof BunDatabase> | null {
   return rawDb;
 }
 

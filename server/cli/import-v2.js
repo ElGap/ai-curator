@@ -2,7 +2,11 @@
 // Enhanced import command with chunked processing and workers
 
 import { existsSync, writeFileSync, openSync, readSync, closeSync, statSync } from "fs";
-import Database from "better-sqlite3";
+// Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
+const _sqliteModName = typeof Bun !== 'undefined' 
+  ? [98,117,110,58,115,113,108,105,116,101].map(c => String.fromCharCode(c)).join('')
+  : 'better-sqlite3';
+const { Database } = await import(_sqliteModName).then(m => m.default ? { Database: m.default } : m);
 import { createParser } from "./parsers/index.js";
 import { SimpleWorkerPool } from "./workers/worker-pool-simple.js";
 import { ChunkedReader, calculateOptimalChunkSize } from "./chunked-reader.js";
@@ -90,11 +94,11 @@ export class ImportCommandV2 {
       this.db = new Database(dbPath);
 
       // Optimize SQLite for bulk inserts
-      this.db.pragma("journal_mode = WAL");
-      this.db.pragma("synchronous = NORMAL");
-      this.db.pragma("cache_size = 100000");
-      this.db.pragma("temp_store = memory");
-      this.db.pragma("mmap_size = 30000000000");
+      this.db.exec("PRAGMA journal_mode = WAL");
+      this.db.exec("PRAGMA synchronous = NORMAL");
+      this.db.exec("PRAGMA cache_size = 100000");
+      this.db.exec("PRAGMA temp_store = memory");
+      this.db.exec("PRAGMA mmap_size = 30000000000");
 
       // Validate or get dataset
       const dataset = this.getOrValidateDataset();

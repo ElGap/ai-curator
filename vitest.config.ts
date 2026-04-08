@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import path from "path";
 
 export default defineConfig({
   test: {
@@ -6,7 +7,6 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./test/setup.ts"],
     env: {
-      // Skip auto-import of starter pack during tests
       AI_CURATOR_SKIP_AUTO_IMPORT: "1",
     },
     coverage: {
@@ -22,5 +22,11 @@ export default defineConfig({
     },
     include: ["test/**/*.test.ts", "test/**/*.spec.ts", "**/*.test.ts", "**/*.spec.ts"],
     exclude: ["node_modules", ".nuxt", ".output"],
+  },
+  resolve: {
+    alias: {
+      "bun:sqlite": path.resolve(__dirname, "test/mocks/bun-sqlite.ts"),
+      "drizzle-orm/bun-sqlite": path.resolve(__dirname, "test/mocks/drizzle-bun-sqlite.ts"),
+    },
   },
 });

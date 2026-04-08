@@ -3,7 +3,11 @@
 
 import { join, resolve } from "path";
 import { writeFileSync } from "fs";
-import Database from "better-sqlite3";
+// Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
+const _sqliteModName = typeof Bun !== 'undefined' 
+  ? [98,117,110,58,115,113,108,105,116,101].map(c => String.fromCharCode(c)).join('')
+  : 'better-sqlite3';
+const { Database } = await import(_sqliteModName).then(m => m.default ? { Database: m.default } : m);
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import os from "os";

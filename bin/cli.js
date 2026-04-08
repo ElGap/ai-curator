@@ -1331,7 +1331,15 @@ async function handleReset(args) {
   console.log("\n🧹 Resetting database...\n");
 
   try {
-    const { default: Database } = await import("better-sqlite3");
+    // Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
+    const _sqliteModName =
+      typeof Bun !== "undefined"
+        ? [98, 117, 110, 58, 115, 113, 108, 105, 116, 101]
+            .map((c) => String.fromCharCode(c))
+            .join("")
+        : "better-sqlite3";
+    const mod = await import(_sqliteModName);
+    const Database = mod.default || mod.Database;
     const db = new Database(dbPath);
 
     // Clean slate: Create complete schema if tables don't exist

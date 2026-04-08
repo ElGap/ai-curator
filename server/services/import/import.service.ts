@@ -1,8 +1,12 @@
 import { getDb, type DatabaseClient } from "../../db/index.ts";
 import { samples as samplesTable, datasets } from "../../db/schema.ts";
 import { eq } from "drizzle-orm";
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+// Runtime-aware SQLite: uses bun:sqlite under Bun, better-sqlite3 under Node.js
+// Module name obfuscated to prevent static analysis
+const _bunMod = typeof Bun !== 'undefined' ? [98,117,110,58,115,113,108,105,116,101].map(c => String.fromCharCode(c)).join('') : 'better-sqlite3';
+const _drizzleMod = typeof Bun !== 'undefined' ? 'drizzle-orm/bun-sqlite' : 'drizzle-orm/better-sqlite3';
+const Database = (await import(_bunMod)).default || (await import(_bunMod)).Database;
+const drizzle = (await import(_drizzleMod)).drizzle;
 import * as schema from "../../db/schema.ts";
 import type {
   ImportOptions,
@@ -31,7 +35,7 @@ export class ImportService {
     // If dbPath provided, create new connection; otherwise use shared
     if (dbPath) {
       const sqlite = new Database(dbPath);
-      sqlite.pragma("journal_mode = WAL");
+      sqlite.exec("PRAGMA journal_mode = WAL");
       this.db = drizzle(sqlite, { schema });
     } else {
       this.db = getDb();

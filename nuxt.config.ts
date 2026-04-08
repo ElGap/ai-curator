@@ -19,23 +19,18 @@ export default defineNuxtConfig({
     experimental: {
       wasm: true,
     },
-    // Externalize native dependencies - let npm handle platform-specific binaries
+    // Enable top-level await support
+    esbuild: {
+      options: {
+        target: "es2022",
+      },
+    },
     externals: {
-      external: [
-        "better-sqlite3",
-        "bindings",
-        "file-uri-to-path",
-        "prebuild-install",
-        "napi-build-utils",
-        "node-gyp",
-        "tar",
-        "rc",
-        "pump",
-        "simple-get",
-        "which-pm-runs",
-        "expand-template",
-        "github-from-package",
-      ],
+      external: ["bun:sqlite"],
+    },
+    alias: {
+      "bun:sqlite": "better-sqlite3",
+      "drizzle-orm/bun-sqlite": "drizzle-orm/better-sqlite3",
     },
     routeRules: {
       // Security: Limit request body sizes to prevent DoS

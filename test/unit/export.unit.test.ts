@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { QueryParser } from "../../server/cli/export.js";
 import { createIsolatedTestEnvironment, cleanupIsolatedTestEnvironment } from "../test-env.js";
-import Database from "better-sqlite3";
+import { Database } from "bun:sqlite";
 
 // Unit tests for QueryParser (pure logic, no DB needed)
 describe("Export QueryParser Unit Tests", () => {
@@ -150,7 +150,7 @@ describe("Export QueryParser Unit Tests", () => {
 // Integration tests with real database
 describe("Export CLI Integration Tests (Real DB)", () => {
   let testEnv: { tempDir: string; dataDir: string; dbPath: string };
-  let testDb: Database.Database;
+  let testDb: any;
   let testDbPath: string;
 
   beforeAll(() => {

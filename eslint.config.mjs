@@ -74,6 +74,7 @@ const nodeGlobals = {
   clearInterval: "readonly",
   setImmediate: "readonly",
   clearImmediate: "readonly",
+  Bun: "readonly",
 };
 
 // Vue/Nuxt globals

@@ -11,7 +11,8 @@
 import { mkdirSync, rmSync, existsSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
-import Database from "better-sqlite3";
+// bun:sqlite is aliased to better-sqlite3 via vitest.config.ts for Node.js test env
+import { Database } from 'bun:sqlite';
 
 /**
  * Create a fresh test environment for the current test file
@@ -57,9 +58,8 @@ export function cleanupIsolatedTestEnvironment(tempDir: string) {
  */
 export function resetTestDatabase(dbPath: string) {
   const db = new Database(dbPath);
-  // Use DELETE mode for reliable test isolation
-  db.pragma("journal_mode = DELETE");
-  db.pragma("foreign_keys = OFF");
+  db.exec("PRAGMA journal_mode = DELETE");
+  db.exec("PRAGMA foreign_keys = OFF");
 
   // Get all tables
   const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all() as {
@@ -84,7 +84,7 @@ export function resetTestDatabase(dbPath: string) {
     // Ignore
   }
 
-  db.pragma("foreign_keys = ON");
+  db.exec("PRAGMA foreign_keys = ON");
 
   // Re-seed
   db.exec(`
@@ -115,10 +115,8 @@ export function resetTestDatabase(dbPath: string) {
  */
 function seedTestDatabase(dbPath: string) {
   const db = new Database(dbPath);
-  // Use DELETE mode instead of WAL for test isolation
-  // WAL mode can cause sync issues when subprocesses read before checkpoint
-  db.pragma("journal_mode = DELETE");
-  db.pragma("foreign_keys = OFF");
+  db.exec("PRAGMA journal_mode = DELETE");
+  db.exec("PRAGMA foreign_keys = OFF");
 
   db.exec(`
     CREATE TABLE IF NOT EXISTS samples (
@@ -283,7 +281,7 @@ function seedTestDatabase(dbPath: string) {
     CREATE INDEX IF NOT EXISTS idx_export_logs_dataset_id ON export_logs(dataset_id);
   `);
 
-  db.pragma("foreign_keys = ON");
+  db.exec("PRAGMA foreign_keys = ON");
 
   // Seed initial data
   db.exec(`
