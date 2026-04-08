@@ -7,18 +7,24 @@
   "private": false,
   "type": "module",
   "bin": {
-    "curator": "./dist/curator.mjs"
+    "curator": "./bin/curator.js"
   },
-  "main": "./dist/curator.mjs",
+  "main": "./bin/curator.js",
   "files": [
-    ".output/",
-    "dist/",
     "bin/",
     "datasets/",
-    "scripts/postinstall.js",
     "install.sh",
     "README.md",
     "LICENSE"
+  ],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
   ],
   "publishConfig": {
     "access": "public"
@@ -28,8 +34,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "node scripts/postinstall.js || nuxt prepare || true",
-    "prepublishOnly": "npm run build && node scripts/bundle-cli.cjs",
+    "prepublishOnly": "npm run test && npm run lint",
     "db:generate": "drizzle-kit generate:sqlite",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
