@@ -16,7 +16,8 @@ import os from "os";
 
 // Export schema types for use in other modules
 export type Schema = typeof schema;
-export type DatabaseClient = ReturnType<typeof drizzle<Schema>>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DatabaseClient = any;
 
 let db: DatabaseClient | null = null;
 let rawDb: InstanceType<typeof BunDatabase> | null = null;

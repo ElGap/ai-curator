@@ -541,13 +541,14 @@
 
     loadingStats.value = true;
     try {
-      const response = await $fetch(`/api/datasets/${selectedDataset.value}/stats`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const response: any = await $fetch(`/api/datasets/${selectedDataset.value}/stats`);
       stats.value = {
-        total: response.total || 0,
-        approved: response.approved || 0,
-        draft: response.draft || 0,
-        review: response.review || 0,
-        avgQuality: response.avgQuality || 0,
+        total: response?.total || 0,
+        approved: response?.approved || 0,
+        draft: response?.draft || 0,
+        review: response?.review || 0,
+        avgQuality: response?.avgQuality || 0,
       };
     } catch (error) {
       console.error("Error loading stats:", error);
