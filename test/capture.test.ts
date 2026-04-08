@@ -3,9 +3,12 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 
+const TEST_PORT = process.env.AI_CURATOR_PORT || "3333";
+const TEST_URL = `http://localhost:${TEST_PORT}`;
+
 async function isServerRunning(): Promise<boolean> {
   try {
-    const response = await fetch("http://localhost:3030/api", { method: "GET" });
+    const response = await fetch(`${TEST_URL}/api`, { method: "GET" });
     return response.status === 200;
   } catch {
     return false;
@@ -13,13 +16,13 @@ async function isServerRunning(): Promise<boolean> {
 }
 
 describe("Capture Endpoint", () => {
-  const baseUrl = "http://localhost:3030";
+  const baseUrl = TEST_URL;
   let serverRunning = false;
 
   beforeAll(async () => {
     serverRunning = await isServerRunning();
     if (!serverRunning) {
-      console.log("⚠️  Server not running at localhost:3030, skipping integration tests");
+      console.log(`⚠️  Server not running at ${TEST_URL}, skipping integration tests`);
     }
   });
 
