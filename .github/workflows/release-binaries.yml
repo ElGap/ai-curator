@@ -35,6 +35,9 @@ jobs:
             echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Install dependencies
+        run: bun install
+
       - name: Build binary
         run: |
           bun build --compile --target=bun-darwin-arm64 \
@@ -49,41 +52,6 @@ jobs:
         with:
           name: curator-darwin-arm64
           path: curator-darwin-arm64*
-
-  build-macos-x64:
-    name: Build macOS x64
-    runs-on: macos-13
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Get version
-        id: get_version
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Build binary
-        run: |
-          bun build --compile --target=bun-darwin-x64 \
-            ./bin/cli.js \
-            --outfile "curator-darwin-x64"
-
-      - name: Calculate SHA256
-        run: shasum -a 256 curator-darwin-x64 > curator-darwin-x64.sha256
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: curator-darwin-x64
-          path: curator-darwin-x64*
 
   build-linux-x64:
     name: Build Linux x64
@@ -104,6 +72,9 @@ jobs:
           else
             echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
+
+      - name: Install dependencies
+        run: bun install
 
       - name: Build binary
         run: |
@@ -139,6 +110,9 @@ jobs:
           else
             echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
+
+      - name: Install dependencies
+        run: bun install
 
       - name: Build binary
         run: |
@@ -176,6 +150,9 @@ jobs:
             echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
           fi
 
+      - name: Install dependencies
+        run: bun install
+
       - name: Build binary
         run: |
           bun build --compile --target=bun-windows-x64 `
@@ -197,7 +174,7 @@ jobs:
   release:
     name: Create Release
     needs:
-      [build-macos-arm64, build-macos-x64, build-linux-x64, build-linux-arm64, build-windows-x64]
+      [build-macos-arm64, build-linux-x64, build-linux-arm64, build-windows-x64]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
@@ -253,7 +230,6 @@ jobs:
             | Platform | Binary | SHA256 |
             |----------|--------|--------|
             | macOS ARM64 | curator-darwin-arm64 | Check .sha256 file |
-            | macOS x64 | curator-darwin-x64 | Check .sha256 file |
             | Linux x64 | curator-linux-x64 | Check .sha256 file |
             | Linux ARM64 | curator-linux-arm64 | Check .sha256 file |
 
