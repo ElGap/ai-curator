@@ -1,12 +1,12 @@
 #!/bin/bash
-
-# AI Curator Installer
-# One-command installation for non-technical users
+#
+# AI Curator Binary Installer
+# Downloads and installs pre-built binaries
 #
 # Usage:
-#   One-line install:  curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash
-#   With auto-yes:    curl -fsSL ... | bash -s -- --yes
-#   Local install:    ./install.sh
+#   curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash
+#   curl -fsSL ... | bash -s -- --version 0.5.0
+#   curl -fsSL ... | bash -s -- --prefix /usr/local
 
 set -e
 
@@ -14,42 +14,51 @@ set -e
 # CONFIGURATION
 # ============================================================================
 
-REPO_URL="https://github.com/elgap/ai-curator"
-AUTO_YES=false
-INSTALL_NODE=false
-INSTALL_DIR=""
+REPO="elgap/ai-curator"
+GITHUB_URL="https://github.com/${REPO}"
+API_URL="https://api.github.com/repos/${REPO}"
 
-# Get version from package.json if available (for developer mode)
-# Otherwise use a default version
-get_version() {
-    if [ -f "package.json" ]; then
-        # Extract version from package.json using grep/sed (no Node.js required yet)
-        grep -o '"version": *"[^"]*"' package.json | sed 's/.*"\([^"]*\)".*/\1/' | head -1
-    else
-        echo "0.3.2-beta"
-    fi
-}
+# Default installation directory
+PREFIX="${PREFIX:-$HOME/.local}"
+INSTALL_DIR="${INSTALL_DIR:-$PREFIX/bin}"
+VERSION="${VERSION:-latest}"
+FORCE=false
+DRY_RUN=false
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 
 # ============================================================================
-# HELPER FUNCTIONS
+# UTILITY FUNCTIONS
 # ============================================================================
 
-# Detect if running in developer mode (from git repo) or user mode (piped)
-detect_mode() {
-    if [ -d ".git" ] && [ -f "package.json" ] && [ -f "README.md" ]; then
-        echo "developer"
-    else
-        echo "user"
-    fi
+print_header() {
+    echo ""
+    echo -e "${CYAN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${CYAN}║${NC}           AI Curator Installer                             ${CYAN}║${NC}"
+    echo -e "${CYAN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
 }
 
-# Read from TTY when script is piped (for user prompts)
-read_tty() {
-    if [ -t 0 ]; then
-        read "$@"
-    else
-        read "$@" < /dev/tty
-    fi
+print_success() {
+    echo -e "${GREEN}✓${NC} $1"
+}
+
+print_error() {
+    echo -e "${RED}✗${NC} $1"
+}
+
+print_info() {
+    echo -e "${BLUE}→${NC} $1"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠${NC} $1"
 }
 
 # Check if command exists
@@ -57,628 +66,419 @@ command_exists() {
     command -v "$1" >/dev/null 2>&1
 }
 
-# ============================================================================
-# OS DETECTION
-# ============================================================================
-
-detect_os() {
-    case "$(uname -s)" in
-        Darwin)
-            echo "macos"
+# Detect platform
+detect_platform() {
+    local os=$(uname -s | tr '[:upper:]' '[:lower:]')
+    local arch=$(uname -m)
+    
+    # Map architecture names
+    case "$arch" in
+        x86_64|amd64)
+            arch="x64"
             ;;
-        Linux)
-            echo "linux"
+        arm64|aarch64)
+            arch="arm64"
             ;;
         *)
-            echo "unknown"
+            print_error "Unsupported architecture: $arch"
+            exit 1
             ;;
     esac
+    
+    # Map OS names
+    case "$os" in
+        darwin)
+            os="darwin"
+            ;;
+        linux)
+            os="linux"
+            ;;
+        *)
+            print_error "Unsupported operating system: $os"
+            print_info "AI Curator supports macOS (Apple Silicon) and Linux"
+            exit 1
+            ;;
+    esac
+    
+    echo "${os}-${arch}"
 }
 
-# ============================================================================
-# PREREQUISITE CHECKS
-# ============================================================================
-
-check_os() {
-    OS=$(detect_os)
+# Get latest version from GitHub
+get_latest_version() {
+    if [ "$VERSION" != "latest" ]; then
+        echo "$VERSION"
+        return
+    fi
     
-    if [ "$OS" = "unknown" ]; then
-        echo "Error: AI Curator supports macOS and Linux only"
-        echo "Your OS: $(uname -s)"
+    print_info "Checking for latest version..."
+    
+    # Try to get from latest.json first
+    local latest_url="${GITHUB_URL}/releases/latest/download/latest.json"
+    local version=$(curl -fsSL "$latest_url" 2>/dev/null | grep -o '"version": "[^"]*"' | cut -d'"' -f4)
+    
+    if [ -n "$version" ]; then
+        echo "$version"
+        return
+    fi
+    
+    # Fallback to GitHub API
+    version=$(curl -fsSL "${API_URL}/releases/latest" 2>/dev/null | grep -o '"tag_name": "[^"]*"' | head -1 | cut -d'"' -f4 | sed 's/^v//')
+    
+    if [ -n "$version" ]; then
+        echo "$version"
+        return
+    fi
+    
+    # Last resort: use hardcoded version
+    echo "0.5.0"
+}
+
+# Download file with progress
+download_file() {
+    local url="$1"
+    local output="$2"
+    
+    if command_exists curl; then
+        curl -fsSL --progress-bar "$url" -o "$output"
+    elif command_exists wget; then
+        wget -q --show-progress "$url" -O "$output"
+    else
+        print_error "Neither curl nor wget found. Please install one of them."
         exit 1
     fi
-    
-    echo "Operating System: $OS"
 }
 
-check_arch() {
-    local arch=$(uname -m)
-    echo "Architecture: $arch"
+# Verify SHA256 checksum
+verify_checksum() {
+    local file="$1"
+    local expected="$2"
     
-    if [[ "$arch" == "arm64" ]] || [[ "$arch" == "aarch64" ]]; then
-        echo "Apple Silicon / ARM64 detected"
-    elif [[ "$arch" == "x86_64" ]]; then
-        echo "Intel/AMD x86_64 detected"
+    if command_exists sha256sum; then
+        local actual=$(sha256sum "$file" | cut -d' ' -f1)
+    elif command_exists shasum; then
+        local actual=$(shasum -a 256 "$file" | cut -d' ' -f1)
     else
-        echo "Warning: Architecture $arch may not be fully supported"
+        print_warning "Cannot verify checksum (sha256sum/shasum not found)"
+        return 0
     fi
+    
+    if [ "$actual" != "$expected" ]; then
+        print_error "Checksum verification failed!"
+        print_error "  Expected: $expected"
+        print_error "  Actual:   $actual"
+        return 1
+    fi
+    
+    return 0
 }
 
-check_nodejs() {
-    echo ""
-    echo "Checking Node.js..."
+# ============================================================================
+# INSTALLATION FUNCTIONS
+# ============================================================================
+
+install_binary() {
+    local platform="$1"
+    local version="$2"
+    local install_dir="$3"
     
-    if ! command_exists node; then
-        echo "Node.js is not installed."
-        
-        if [ "$MODE" = "user" ]; then
-            echo "It will be installed automatically."
-            INSTALL_NODE=true
-        else
-            echo "Error: Node.js is required"
-            echo "Please install Node.js 18+ from https://nodejs.org/"
-            exit 1
-        fi
-    else
-        local node_version=$(node --version | grep -o 'v[0-9]*' | head -1 | tr -d 'v')
-        
-        if [ -z "$node_version" ]; then
-            node_version=$(node --version 2>&1 | grep -o '[0-9]*' | head -1)
-        fi
-        
-        if [ "$node_version" -lt 18 ]; then
-            if [ "$MODE" = "user" ]; then
-                echo "Node.js version $node_version found, but 18+ is required"
-                echo "It will be upgraded automatically."
-                INSTALL_NODE=true
+    local os=$(echo "$platform" | cut -d'-' -f1)
+    local arch=$(echo "$platform" | cut -d'-' -f2)
+    
+    local filename="ai-curator-${version}-${os}-${arch}"
+    local archive_name="${filename}.tar.gz"
+    local download_url="${GITHUB_URL}/releases/download/v${version}/${archive_name}"
+    local temp_dir=$(mktemp -d)
+    
+    print_info "Platform: ${os} (${arch})"
+    print_info "Version: ${version}"
+    print_info "Download URL: ${download_url}"
+    echo ""
+    
+    # Download archive
+    print_info "Downloading AI Curator ${version}..."
+    if ! download_file "$download_url" "${temp_dir}/${archive_name}"; then
+        print_error "Failed to download archive"
+        print_info "URL: ${download_url}"
+        rm -rf "$temp_dir"
+        exit 1
+    fi
+    print_success "Downloaded ${archive_name}"
+    
+    # Download and verify checksum (optional but recommended)
+    print_info "Verifying checksum..."
+    local shasums_url="${GITHUB_URL}/releases/download/v${version}/SHASUMS256.txt"
+    if curl -fsSL "$shasums_url" -o "${temp_dir}/SHASUMS256.txt" 2>/dev/null; then
+        local expected_checksum=$(grep "${archive_name}$" "${temp_dir}/SHASUMS256.txt" | cut -d' ' -f1)
+        if [ -n "$expected_checksum" ]; then
+            if verify_checksum "${temp_dir}/${archive_name}" "$expected_checksum"; then
+                print_success "Checksum verified"
             else
-                echo "Error: Node.js 18 or higher is required (found $(node --version))"
+                rm -rf "$temp_dir"
                 exit 1
             fi
         else
-            echo "Node.js $(node --version) found ✓"
-        fi
-    fi
-    
-    # Check npm
-    if ! command_exists npm; then
-        if [ "$INSTALL_NODE" = false ]; then
-            echo "Error: npm is not installed (should come with Node.js)"
-            exit 1
+            print_warning "Checksum not found in SHASUMS256.txt"
         fi
     else
-        echo "npm $(npm --version) found ✓"
-    fi
-}
-
-check_build_tools() {
-    echo ""
-    echo "Checking build tools..."
-    
-    if [ "$OS" = "macos" ]; then
-        # Check for Xcode Command Line Tools
-        if ! command_exists gcc; then
-            echo "Warning: Xcode Command Line Tools not found"
-            echo "Installing now (this may take a few minutes)..."
-            xcode-select --install 2>/dev/null || true
-            
-            if [ "$AUTO_YES" = false ]; then
-                echo ""
-                echo "Please click 'Install' in the dialog that appeared."
-                read_tty -p "Press Enter when installation is complete..."
-            else
-                echo "Please complete the installation manually and run this script again."
-                exit 1
-            fi
-        else
-            echo "Xcode Command Line Tools found ✓"
-        fi
-        
-        # Check for Python (needed for node-gyp)
-        if ! command_exists python3; then
-            echo "Python 3 not found. Installing via Xcode CLT..."
-            # Python should be installed with Xcode CLT
-            if ! command_exists python3; then
-                echo "Warning: Python 3 installation may have failed"
-                echo "You may need to install it manually."
-            fi
-        else
-            echo "Python $(python3 --version 2>&1 | cut -d' ' -f2) found ✓"
-        fi
-        
-    elif [ "$OS" = "linux" ]; then
-        # Check for build-essential
-        if ! command_exists gcc; then
-            echo "Build tools not found. Please install:"
-            echo "  Ubuntu/Debian: sudo apt-get install build-essential python3"
-            echo "  Fedora/RHEL:   sudo dnf install gcc-c++ python3"
-            echo "  Arch:          sudo pacman -S base-devel python"
-            
-            if [ "$AUTO_YES" = false ]; then
-                read_tty -p "Have you installed the build tools? (y/N) " -n 1 -r
-                echo
-                if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                    exit 1
-                fi
-            else
-                exit 1
-            fi
-        else
-            echo "Build tools found ✓"
-        fi
-    fi
-}
-
-check_git() {
-    echo ""
-    echo "Checking Git..."
-    
-    if ! command_exists git; then
-        if [ "$OS" = "macos" ]; then
-            echo "Git not found. Installing Xcode Command Line Tools..."
-            xcode-select --install 2>/dev/null || true
-            echo "Please complete the installation and run this script again."
-            exit 1
-        elif [ "$OS" = "linux" ]; then
-            echo "Git not found. Please install it:"
-            echo "  Ubuntu/Debian: sudo apt-get install git"
-            echo "  Fedora/RHEL:   sudo dnf install git"
-            exit 1
-        fi
+        print_warning "Could not download checksums file"
     fi
     
-    echo "Git $(git --version | cut -d' ' -f3) found ✓"
-}
-
-# ============================================================================
-# INSTALLATION STEPS
-# ============================================================================
-
-install_nodejs_macos() {
-    echo ""
-    echo "Installing Node.js for macOS..."
-    echo "Downloading Node.js LTS..."
+    # Extract archive
+    print_info "Extracting archive..."
+    tar -xzf "${temp_dir}/${archive_name}" -C "$temp_dir"
+    print_success "Extracted archive"
     
-    # Get latest LTS version
-    local node_version="20.11.1"
-    local pkg_file="node-v${node_version}.pkg"
+    # Create install directory if needed
+    if [ ! -d "$install_dir" ]; then
+        print_info "Creating directory: ${install_dir}"
+        mkdir -p "$install_dir"
+    fi
     
-    # Detect architecture
-    local arch=$(uname -m)
-    if [[ "$arch" == "arm64" ]]; then
-        local download_url="https://nodejs.org/dist/v${node_version}/node-v${node_version}-arm64.pkg"
+    # Install binary
+    local binary_source="${temp_dir}/${filename}/curator"
+    local binary_dest="${install_dir}/curator"
+    
+    if [ "$DRY_RUN" = true ]; then
+        print_info "[DRY RUN] Would install: ${binary_source} → ${binary_dest}"
     else
-        local download_url="https://nodejs.org/dist/v${node_version}/node-v${node_version}.pkg"
+        cp "$binary_source" "$binary_dest"
+        chmod +x "$binary_dest"
+        print_success "Installed: ${binary_dest}"
     fi
     
-    curl -fsSL "$download_url" -o "/tmp/$pkg_file" || {
-        echo "Error: Failed to download Node.js"
-        echo "Please install manually from https://nodejs.org/"
-        exit 1
-    }
+    # Cleanup
+    rm -rf "$temp_dir"
     
-    echo "Installing Node.js (you may need to enter your password)..."
-    sudo installer -pkg "/tmp/$pkg_file" -target / || {
-        echo "Error: Failed to install Node.js"
-        exit 1
-    }
-    
-    rm "/tmp/$pkg_file"
-    
-    # Update PATH for current session
-    export PATH="/usr/local/bin:/opt/homebrew/bin:$PATH"
-    
-    echo "Node.js $(node --version) installed ✓"
-}
-
-install_nodejs_linux() {
     echo ""
-    echo "Installing Node.js for Linux..."
-    
-    # Detect package manager
-    if command_exists apt-get; then
-        echo "Using apt (Debian/Ubuntu)..."
-        curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-        sudo apt-get install -y nodejs
-    elif command_exists dnf; then
-        echo "Using dnf (Fedora/RHEL)..."
-        sudo dnf install -y nodejs
-    elif command_exists pacman; then
-        echo "Using pacman (Arch)..."
-        sudo pacman -S --noconfirm nodejs npm
-    elif command_exists zypper; then
-        echo "Using zypper (openSUSE)..."
-        sudo zypper install -y nodejs npm
-    else
-        echo "Error: Could not detect package manager"
-        echo "Please install Node.js 18+ manually from https://nodejs.org/"
-        exit 1
-    fi
-    
-    echo "Node.js $(node --version) installed ✓"
-}
-
-install_nodejs() {
-    if [ "$INSTALL_NODE" = true ]; then
-        if [ "$OS" = "macos" ]; then
-            install_nodejs_macos
-        else
-            install_nodejs_linux
-        fi
-    fi
-}
-
-setup_installation_directory() {
-    echo ""
-    echo "Setting up installation directory..."
-    
-    if [ "$MODE" = "user" ]; then
-        # Install in current directory (Solution D)
-        INSTALL_DIR="$(pwd)"
-        
-        echo "Installing to: $INSTALL_DIR"
-        echo ""
-        
-        # Safety check: warn if directory is not empty and contains non-curator files
-        if [ "$(ls -A 2>/dev/null | grep -v "^ai-curator$" | grep -v "^\\." | head -1)" ]; then
-            echo "Warning: Current directory is not empty"
-            echo "   Files will be added to: $INSTALL_DIR"
-            echo ""
-            
-            if [ "$AUTO_YES" = false ]; then
-                read_tty -p "Continue with installation here? (Y/n) " -n 1 -r
-                echo
-                if [[ ! $REPLY =~ ^[Yy]$ ]] && [ -n "$REPLY" ]; then
-                    echo "Installation cancelled. Please create an empty directory and try again:"
-                    echo "  mkdir ~/ai-curator && cd ~/ai-curator"
-                    echo "  curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash"
-                    exit 0
-                fi
-            fi
-        fi
-        
-        # Clone repository into temp location first, then move files
-        echo "Downloading AI Curator..."
-        
-        TEMP_DIR=$(mktemp -d)
-        git clone --depth 1 "$REPO_URL.git" "$TEMP_DIR" || {
-            echo "Error: Failed to download AI Curator"
-            rm -rf "$TEMP_DIR"
-            exit 1
-        }
-        
-        # Move files from temp to current directory
-        echo "Extracting files to current directory..."
-        shopt -s dotglob 2>/dev/null || true
-        mv "$TEMP_DIR"/* "$INSTALL_DIR"/ 2>/dev/null || true
-        mv "$TEMP_DIR"/.* "$INSTALL_DIR"/ 2>/dev/null || true
-        rm -rf "$TEMP_DIR"
-        
-        echo "Downloaded successfully"
-    else
-        # Developer mode - use current directory
-        INSTALL_DIR="$(pwd)"
-        echo "Developer mode. Installing in: $INSTALL_DIR"
-    fi
-}
-
-install_dependencies() {
-    echo ""
-    echo "Installing Node.js dependencies..."
-    echo "This may take a few minutes (compiling native modules)..."
-    
-    # Install with verbose output for progress
-    npm ci 2>&1 | tee /tmp/npm-install.log | grep -E "(added|packages?|built|gyp|error)" || true
-    
-    if [ ${PIPESTATUS[0]} -ne 0 ]; then
-        echo ""
-        echo "Error: npm install failed"
-        echo "Check /tmp/npm-install.log for details"
-        
-        # Check for common issues
-        if grep -q "gyp" /tmp/npm-install.log; then
-            echo ""
-            echo "This looks like a build tools issue. Please ensure you have:"
-            echo "  - macOS: Xcode Command Line Tools (xcode-select --install)"
-            echo "  - Linux: build-essential (apt-get install build-essential)"
-        fi
-        
-        exit 1
-    fi
-    
-    echo "Dependencies installed ✓"
-}
-
-build_application() {
-    echo ""
-    echo "Building AI Curator..."
-    
-    npm run build || {
-        echo "Error: Build failed"
-        exit 1
-    }
-    
-    npm run bundle:cli || {
-        echo "Error: CLI bundling failed"
-        exit 1
-    }
-    
-    echo "Build complete ✓"
-}
-
-create_curator_wrapper() {
-    echo ""
-    echo "Creating curator command..."
-    
-    # Create a wrapper script that can be called as 'curator'
-    cat > curator << 'WRAPPER_EOF'
-#!/bin/bash
-# AI Curator CLI Wrapper
-# Installed at: INSTALL_DIR_PLACEHOLDER
-
-INSTALL_DIR="INSTALL_DIR_PLACEHOLDER"
-
-if [ ! -f "$INSTALL_DIR/dist/curator.mjs" ]; then
-    echo "Error: AI Curator not found at $INSTALL_DIR"
-    echo "Please reinstall: curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash"
-    exit 1
-fi
-
-node "$INSTALL_DIR/dist/curator.mjs" "$@"
-WRAPPER_EOF
-    
-    # Replace placeholder with actual path
-    sed -i.bak "s|INSTALL_DIR_PLACEHOLDER|$INSTALL_DIR|g" curator
-    rm -f curator.bak
-    
-    chmod +x curator
-    echo "Created: curator (CLI wrapper)"
-}
-
-create_desktop_shortcut() {
-    if [ "$MODE" = "user" ] && [ "$OS" = "macos" ]; then
-        echo ""
-        echo "Creating Desktop shortcut..."
-        
-        local desktop_link="${HOME}/Desktop/AI-Curator.command"
-        cat > "$desktop_link" << EOF
-#!/bin/bash
-cd "$INSTALL_DIR"
-./curator
-EOF
-        chmod +x "$desktop_link"
-        echo "Created Desktop shortcut: ~/Desktop/AI-Curator.command"
-    fi
+    return 0
 }
 
 add_to_path() {
-    if [ "$MODE" = "user" ]; then
-        echo ""
-        echo "Adding to PATH..."
-        
-        local shell_rc=""
-        if [ -f "$HOME/.zshrc" ]; then
-            shell_rc="$HOME/.zshrc"
-        elif [ -f "$HOME/.bashrc" ]; then
+    local install_dir="$1"
+    
+    # Check if already in PATH
+    case ":$PATH:" in
+        *":$install_dir:"*)
+            print_success "Already in PATH"
+            return
+            ;;
+    esac
+    
+    print_info "Adding to PATH..."
+    
+    # Detect shell
+    local shell_rc=""
+    if [ -n "$ZSH_VERSION" ] || [ -f "$HOME/.zshrc" ]; then
+        shell_rc="$HOME/.zshrc"
+    elif [ -n "$BASH_VERSION" ]; then
+        if [ -f "$HOME/.bashrc" ]; then
             shell_rc="$HOME/.bashrc"
         elif [ -f "$HOME/.bash_profile" ]; then
             shell_rc="$HOME/.bash_profile"
         fi
-        
-        if [ -n "$shell_rc" ]; then
-            # Check if already in PATH
-            if ! grep -q "^export PATH=.*$INSTALL_DIR" "$shell_rc" 2>/dev/null; then
-                echo "" >> "$shell_rc"
-                echo "# AI Curator" >> "$shell_rc"
-                echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$shell_rc"
-                echo "Added to PATH in $shell_rc"
-            else
-                echo "Already in PATH ✓"
-            fi
+    fi
+    
+    if [ -n "$shell_rc" ]; then
+        if [ "$DRY_RUN" = true ]; then
+            print_info "[DRY RUN] Would add to ${shell_rc}: export PATH=\"${install_dir}:\$PATH\""
         else
-            echo "Could not detect shell config file"
-            echo "Add this to your shell config:"
-            echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+            echo "" >> "$shell_rc"
+            echo "# AI Curator" >> "$shell_rc"
+            echo "export PATH=\"${install_dir}:\$PATH\"" >> "$shell_rc"
+            print_success "Added to PATH in ${shell_rc}"
         fi
-        
-        echo ""
-        echo "For current session, run:"
-        echo "  export PATH=\"$INSTALL_DIR:\$PATH\""
+    else
+        print_warning "Could not detect shell config file"
+        print_info "Add this line manually to your shell config:"
+        print_info "  export PATH=\"${install_dir}:\$PATH\""
     fi
 }
 
-make_available_now() {
-    # Make curator available immediately in current session
-    echo ""
-    echo "Making curator available now..."
-    
-    # Export PATH for current session (only works in current shell process)
-    export PATH="$INSTALL_DIR:$PATH"
-    
-    echo "  curator is now available in this session"
-    echo "  Try: curator --help"
-    echo ""
-    echo "  For new terminal windows, the 'curator' command will be available automatically."
-    echo "  PATH has been added to your shell configuration."
-}
-
 # ============================================================================
-# MAIN INSTALLATION FLOW
+# MAIN
 # ============================================================================
 
 main() {
     # Parse arguments
-    for arg in "$@"; do
-        case $arg in
-            --yes|-y)
-                AUTO_YES=true
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --version)
+                VERSION="$2"
+                shift 2
+                ;;
+            --prefix)
+                PREFIX="$2"
+                INSTALL_DIR="${PREFIX}/bin"
+                shift 2
+                ;;
+            --install-dir)
+                INSTALL_DIR="$2"
+                PREFIX="$(dirname "$INSTALL_DIR")"
+                shift 2
+                ;;
+            --force)
+                FORCE=true
+                shift
+                ;;
+            --dry-run)
+                DRY_RUN=true
                 shift
                 ;;
             --help|-h)
                 echo "AI Curator Installer"
                 echo ""
                 echo "Usage:"
-                echo "  curl -fsSL .../install.sh | bash"
-                echo "  curl -fsSL .../install.sh | bash -s -- --yes"
-                echo "  ./install.sh [--yes]"
+                echo "  curl -fsSL https://.../install.sh | bash"
                 echo ""
-                echo "Options:"
-                echo "  --yes, -y    Auto-accept all prompts"
-                echo "  --help, -h   Show this help"
+                echo "Options (pass as arguments):"
+                echo "  --version VERSION    Install specific version (default: latest)"
+                echo "  --prefix PREFIX      Installation prefix (default: ~/.local)"
+                echo "  --install-dir DIR    Binary installation directory (default: ~/.local/bin)"
+                echo "  --force              Force reinstall if already exists"
+                echo "  --dry-run            Show what would be done without installing"
+                echo "  --help, -h           Show this help"
+                echo ""
+                echo "Examples:"
+                echo "  # Install latest version"
+                echo "  curl -fsSL .../install.sh | bash"
+                echo ""
+                echo "  # Install specific version"
+                echo "  curl -fsSL .../install.sh | bash -s -- --version 0.5.0"
+                echo ""
+                echo "  # Install to /usr/local (requires sudo)"
+                echo "  curl -fsSL .../install.sh | sudo bash -s -- --prefix /usr/local"
+                echo ""
                 exit 0
+                ;;
+            *)
+                print_error "Unknown option: $1"
+                echo "Run with --help for usage information"
+                exit 1
                 ;;
         esac
     done
     
-    # Detect mode
-    MODE=$(detect_mode)
-    OS=$(detect_os)
-    VERSION=$(get_version)
+    # Print header
+    print_header
     
-    # Header
-    echo ""
-    echo "╔════════════════════════════════════════════════════╗"
-    echo "║          AI Curator Installer                      ║"
-    echo "╚════════════════════════════════════════════════════╝"
-    echo ""
-    echo "Mode: $MODE"
+    # Check prerequisites
+    print_info "Checking prerequisites..."
+    
+    if ! command_exists curl && ! command_exists wget; then
+        print_error "curl or wget is required but not installed"
+        exit 1
+    fi
+    
+    if ! command_exists tar; then
+        print_error "tar is required but not installed"
+        exit 1
+    fi
+    
+    print_success "Prerequisites met"
     echo ""
     
-    # Welcome / Continue prompt (user mode only)
-    if [ "$MODE" = "user" ]; then
-        echo "Welcome! This installer will set up AI Curator on your computer."
-        echo ""
-        echo "AI Curator - Privacy-first dataset curation for LLM fine-tuning"
-        echo ""
-        echo "What will be installed:"
-        echo "   - Node.js (if not present or outdated)"
-        echo "   - AI Curator application"
-        echo "   - Build tools (for database compilation)"
-        echo ""
+    # Detect platform
+    print_info "Detecting platform..."
+    local platform=$(detect_platform)
+    print_success "Detected: ${platform}"
+    echo ""
+    
+    # Get version
+    local version=$(get_latest_version)
+    print_success "Version: ${version}"
+    echo ""
+    
+    # Check if already installed
+    local binary_path="${INSTALL_DIR}/curator"
+    if [ -f "$binary_path" ] && [ "$FORCE" != true ] && [ "$DRY_RUN" != true ]; then
+        print_warning "AI Curator is already installed at: ${binary_path}"
+        print_info "Use --force to reinstall or --version to install a specific version"
         
-        if [ "$AUTO_YES" = false ]; then
-            read_tty -p "Continue with installation? (Y/n) " -n 1 -r
-            echo
-            if [[ ! $REPLY =~ ^[Yy]$ ]] && [ -n "$REPLY" ]; then
-                echo "Installation cancelled."
+        # Show current version
+        local current_version=$(${binary_path} --version 2>/dev/null | grep -o '[0-9]\+\.[0-9]\+\.[0-9]\+' | head -1)
+        if [ -n "$current_version" ]; then
+            print_info "Current version: ${current_version}"
+            print_info "Latest version:  ${version}"
+            
+            if [ "$current_version" = "$version" ]; then
+                print_success "Already up to date!"
                 exit 0
+            else
+                print_info "To update, run with --force flag"
             fi
         fi
+        
+        exit 0
     fi
     
-    # System checks
+    # Install
+    print_info "Installing AI Curator..."
     echo ""
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "Checking your system..."
-    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    check_os
-    check_arch
-    check_nodejs
-    check_build_tools
-    check_git
     
-    # Installation
-    install_nodejs
-    setup_installation_directory
-    install_dependencies
-    build_application
+    if ! install_binary "$platform" "$version" "$INSTALL_DIR"; then
+        exit 1
+    fi
     
-    # Import EdukaAI Starter Pack (75 premium samples)
+    # Add to PATH
+    add_to_path "$INSTALL_DIR"
+    
+    # Print success message
     echo ""
-    echo "Importing EdukaAI Starter Pack..."
-    if [ -f "$INSTALL_DIR/datasets/starter-pack/metadata.json" ]; then
-        cd "$INSTALL_DIR"
-        # Read metadata
-        DATASET_NAME=$(node -e "console.log(require('./datasets/starter-pack/metadata.json').dataset_name || 'Starter Pack')")
-        TOTAL_SAMPLES=$(node -e "console.log(require('./datasets/starter-pack/metadata.json').total_samples || 75)")
-        AUTHOR=$(node -e "console.log(require('./datasets/starter-pack/metadata.json').author || 'EdukaAI')")
-        LICENSE=$(node -e "console.log(require('./datasets/starter-pack/metadata.json').license || 'CC-BY-4.0')")
-        
-        # Initialize database first (creates the datasets)
-        ./curator reset --force >/dev/null 2>&1 || true
-        # Import the starter pack
-        if ./curator import "datasets/starter-pack/samples.json" --dataset 2 --status approved --workers 4 2>&1 | grep -q "Import complete"; then
-            echo "   $TOTAL_SAMPLES premium samples loaded and ready!"
-            echo "      Dataset: $DATASET_NAME"
-            echo "      Author: $AUTHOR"
-            echo "      License: $LICENSE"
+    echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${GREEN}║${NC}           Installation Complete!                           ${GREEN}║${NC}"
+    echo -e "${GREEN}╚════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    
+    print_success "AI Curator ${version} installed successfully"
+    echo ""
+    print_info "Installation directory: ${INSTALL_DIR}"
+    print_info "Binary: ${binary_path}"
+    echo ""
+    
+    # Test installation
+    if [ "$DRY_RUN" != true ]; then
+        print_info "Testing installation..."
+        if "${binary_path}" --version 2>/dev/null; then
+            print_success "Installation verified"
         else
-            echo "   Starter pack import may have failed, but you can import manually later:"
-            echo "      curator import datasets/starter-pack/samples.json --dataset 2 --status approved"
+            print_warning "Could not verify installation (binary may not work on this system)"
         fi
-    else
-        echo "   Starter pack not found, but you can still use AI Curator with your own data"
+        echo ""
     fi
     
-    create_curator_wrapper
-    add_to_path
-    make_available_now
-    
-    # Completion
+    # Instructions
+    echo -e "${CYAN}Quick Start:${NC}"
     echo ""
-    echo "╔════════════════════════════════════════════════════╗"
-    echo "║          Installation Complete!                    ║"
-    echo "╚════════════════════════════════════════════════════╝"
+    echo "  1. Open a new terminal (or run: source ~/.zshrc or ~/.bashrc)"
+    echo ""
+    echo "  2. Start AI Curator:"
+    echo -e "     ${CYAN}curator${NC}"
+    echo ""
+    echo "  3. Open your browser to:"
+    echo -e "     ${CYAN}http://localhost:3333${NC}"
+    echo ""
+    echo "  4. CLI commands:"
+    echo -e "     ${CYAN}curator --help${NC}          Show all commands"
+    echo -e "     ${CYAN}curator import data.json${NC} Import a dataset"
+    echo -e "     ${CYAN}curator export --help${NC}   Learn about exporting"
     echo ""
     
-    if [ "$MODE" = "user" ]; then
-        echo "Installation location: $INSTALL_DIR"
-        echo ""
-        echo "The 'curator' command is now available!"
-        echo ""
-        echo "Quick commands:"
-        echo "   curator --help          Show all available commands"
-        echo "   curator                 Start the web UI"
-        echo "   curator export --help   Learn about exporting datasets"
-        echo ""
-        echo "Once running, open: http://localhost:3333"
-        echo ""
-        echo "Quick Start Options:"
-        echo ""
-        echo "   Option 1: Train immediately (5 minutes!)"
-        echo "      The EdukaAI Starter Pack is already imported with 75 samples:"
-        echo "      curator export --dataset 2 --format mlx --output train.jsonl"
-        echo ""
-        echo "   Option 2: Import your own data"
-        echo "      curator import your-data.json --dataset 1"
-        echo ""
-        echo "   Option 3: Enable live capture"
-        echo "      Stream data from your IDE, scripts, or any tool:"
-        echo "      curator → Settings → Live Capture → Enable"
-        echo ""
-        echo "Documentation: $INSTALL_DIR/README.md"
-        echo "Website: https://edukaai.elgap.ai"
-        echo "Support: https://github.com/elgap/ai-curator/issues"
-        echo ""
-        
-        # Offer to launch
-        if [ "$AUTO_YES" = false ]; then
-            read_tty -p "Launch AI Curator now? (Y/n) " -n 1 -r
-            echo
-            if [[ $REPLY =~ ^[Yy]$ ]] || [ -z "$REPLY" ]; then
-                echo ""
-                echo "Launching AI Curator..."
-                sleep 2
-                curator
-            fi
-        else
+    # PATH reminder
+    case ":$PATH:" in
+        *":$INSTALL_DIR:"*)
+            # Already in PATH for this session
+            ;;
+        *)
+            echo "To use curator now, run:"
+            echo -e "  ${CYAN}export PATH=\"${INSTALL_DIR}:\$PATH\"${NC}"
             echo ""
-            echo "To start AI Curator, run:"
-            echo "  curator"
-        fi
-    else
-        # Developer mode
-        echo "Installation complete in: $INSTALL_DIR"
-        echo ""
-        echo "The 'curator' command is available:"
-        echo "   curator --help        Show CLI help"
-        echo "   curator               Start server"
-        echo "   npm run dev           Development mode"
-        echo ""
-        echo "Or run directly:"
-        echo "   node dist/curator.mjs --help"
-    fi
+            ;;
+    esac
+    
+    echo "Documentation: ${GITHUB_URL}#readme"
+    echo "Support: ${GITHUB_URL}/issues"
+    echo ""
 }
 
-# Run main function
+# Run main
 main "$@"

@@ -105,6 +105,10 @@ AGENTS.md
 TODO.md
 NOTES.md
 
+# Local development scripts (not for production)
+scripts/build-local.sh
+scripts/test-distribution.sh
+
 # OpenCode local config
 .opencode/
 opencode.json
