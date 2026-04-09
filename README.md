@@ -24,7 +24,7 @@
 **Three ways to work:**
 
 - **Intuitive Web UI** — Point, click, curate. Perfect for beginners.
-- \*Powerful CLI\*\* — Automate, script, and integrate. Built for professionals.
+- **Powerful CLI** — Automate, script, and integrate. Built for professionals.
 - **Live Capture API** — Real-time data streaming from any tool, IDE, or script. Our most powerful feature.
 
 ## Why AI Curator?
@@ -483,6 +483,6 @@ MIT License — see [LICENSE](LICENSE)
 
 ---
 
-[AI Curator](https://github.com/elgap/ai-curator) and [EdukaAI Studio](https://github.com/elgap/edukaai-studio) are part of the [EdukaAI](https://eduka.elgap.ai) project by ElGap — making AI & fine-tuning accessible through open-source, privacy-first, no-code tools.
+[AI Curator](https://github.com/elgap/ai-curator) and [EdukaAI Studio](https://github.com/elgap/edukaai-studio) are part of the EdukaAI project by ElGap — making AI & fine-tuning accessible through open-source, privacy-first, no-code tools.
 
-We follow the [#rapidMvpMindset](https://elgap.rs/rapid-mvp-mindset), shipping fast and iterating regularly. Expect frequent updates and improvements!
+We follow the [#rapidMvpMindset](https://elgap.rs/rapid-mvp-mindset), shipping fast and iterating regularly. Expect frequent updates.

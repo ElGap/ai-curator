@@ -1,6 +1,6 @@
 {
   "name": "@elgap/ai-curator",
-  "version": "0.4.5-beta",
+  "version": "0.4.6-beta",
   "description": "AI Curator - Privacy-first dataset curation for LLM fine-tuning",
   "author": "ElGap",
   "license": "MIT",
@@ -31,6 +31,7 @@
   },
   "scripts": {
     "build": "nuxt build",
+    "build:bun": "cp nuxt.config.ts nuxt.config.ts.backup && cp nuxt.config.bun.ts nuxt.config.ts && nuxt build; mv nuxt.config.ts.backup nuxt.config.ts",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -39,6 +40,10 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "bundle:cli": "node scripts/bundle-cli.cjs",
+    "bundle:bun:darwin-arm64": "bun build --compile --target=bun-darwin-arm64 ./bin/cli.js --outfile dist/curator-darwin-arm64",
+    "bundle:bun:linux-x64": "bun build --compile --target=bun-linux-x64 ./bin/cli.js --outfile dist/curator-linux-x64",
+    "bundle:bun:linux-arm64": "bun build --compile --target=bun-linux-arm64 ./bin/cli.js --outfile dist/curator-linux-arm64",
+    "bundle:bun:all": "npm run bundle:bun:darwin-arm64 && npm run bundle:bun:linux-x64 && npm run bundle:bun:linux-arm64",
     "db:reset": "node dist/curator.mjs reset --force",
     "lint": "eslint . --fix",
     "format": "prettier --write .",

@@ -46,15 +46,15 @@ print_header() {
 }
 
 print_success() {
-    echo -e "${GREEN}✓${NC} $1"
+    echo -e "${GREEN}✓${NC} $1" >&2
 }
 
 print_error() {
-    echo -e "${RED}✗${NC} $1"
+    echo -e "${RED}✗${NC} $1" >&2
 }
 
 print_info() {
-    echo -e "${BLUE}→${NC} $1"
+    echo -e "${BLUE}→${NC} $1" >&2
 }
 
 print_warning() {
@@ -130,7 +130,7 @@ get_latest_version() {
     fi
     
     # Last resort: use hardcoded version
-    echo "0.5.0"
+    echo "0.4.6-beta"
 }
 
 # Download file with progress
