@@ -1176,7 +1176,7 @@ function showVersion() {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf-8"));
     console.log(`AI Curator v${packageJson.version}`);
     console.log(`Homepage: ${packageJson.homepage || "https://github.com/elgap/ai-curator"}`);
-  } catch (error) {
+  } catch (_error) {
     console.log("AI Curator (version unknown)");
   }
   process.exit(0);

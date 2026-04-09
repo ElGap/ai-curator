@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Version to build (e.g., 0.4.0)"
+        description: "Version to build (e.g., 0.4.6-beta)"
         required: true
         type: string
 
@@ -38,20 +38,35 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Build with Bun config
+        run: bun run build:bun
+
       - name: Build binary
+        run: bun build --compile --target=bun-darwin-arm64 ./bin/cli.js --outfile curator-darwin-arm64
+
+      - name: Create archive
         run: |
-          bun build --compile --target=bun-darwin-arm64 \
-            ./bin/cli.js \
-            --outfile "curator-darwin-arm64"
+          VER="${{ steps.get_version.outputs.VERSION }}"
+          DIR="ai-curator-${VER}-darwin-arm64"
+          mkdir -p "$DIR"
+          cp curator-darwin-arm64 "$DIR/curator"
+          cp LICENSE "$DIR/" 2>/dev/null || true
+          cp README.md "$DIR/" 2>/dev/null || true
+          echo "# AI Curator - Quick Start" > "$DIR/QUICKSTART.md"
+          echo "" >> "$DIR/QUICKSTART.md"
+          echo "## Installation" >> "$DIR/QUICKSTART.md"
+          echo "" >> "$DIR/QUICKSTART.md"
+          echo "1. Extract this archive" >> "$DIR/QUICKSTART.md"
+          echo "2. Move curator to your PATH" >> "$DIR/QUICKSTART.md"
+          echo "3. Run: curator" >> "$DIR/QUICKSTART.md"
+          tar -czf "${DIR}.tar.gz" "$DIR"
+          shasum -a 256 "${DIR}.tar.gz" > "${DIR}.tar.gz.sha256"
 
-      - name: Calculate SHA256
-        run: shasum -a 256 curator-darwin-arm64 > curator-darwin-arm64.sha256
-
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: curator-darwin-arm64
-          path: curator-darwin-arm64*
+          name: darwin-arm64
+          path: ai-curator-*.tar.gz*
 
   build-linux-x64:
     name: Build Linux x64
@@ -76,20 +91,35 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Build with Bun config
+        run: bun run build:bun
+
       - name: Build binary
+        run: bun build --compile --target=bun-linux-x64 ./bin/cli.js --outfile curator-linux-x64
+
+      - name: Create archive
         run: |
-          bun build --compile --target=bun-linux-x64 \
-            ./bin/cli.js \
-            --outfile "curator-linux-x64"
+          VER="${{ steps.get_version.outputs.VERSION }}"
+          DIR="ai-curator-${VER}-linux-x64"
+          mkdir -p "$DIR"
+          cp curator-linux-x64 "$DIR/curator"
+          cp LICENSE "$DIR/" 2>/dev/null || true
+          cp README.md "$DIR/" 2>/dev/null || true
+          echo "# AI Curator - Quick Start" > "$DIR/QUICKSTART.md"
+          echo "" >> "$DIR/QUICKSTART.md"
+          echo "## Installation" >> "$DIR/QUICKSTART.md"
+          echo "" >> "$DIR/QUICKSTART.md"
+          echo "1. Extract this archive" >> "$DIR/QUICKSTART.md"
+          echo "2. Move curator to your PATH" >> "$DIR/QUICKSTART.md"
+          echo "3. Run: curator" >> "$DIR/QUICKSTART.md"
+          tar -czf "${DIR}.tar.gz" "$DIR"
+          sha256sum "${DIR}.tar.gz" > "${DIR}.tar.gz.sha256"
 
-      - name: Calculate SHA256
-        run: sha256sum curator-linux-x64 > curator-linux-x64.sha256
-
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: curator-linux-x64
-          path: curator-linux-x64*
+          name: linux-x64
+          path: ai-curator-*.tar.gz*
 
   build-linux-arm64:
     name: Build Linux ARM64
@@ -114,81 +144,57 @@ jobs:
       - name: Install dependencies
         run: bun install
 
-      - name: Build binary
-        run: |
-          bun build --compile --target=bun-linux-arm64 \
-            ./bin/cli.js \
-            --outfile "curator-linux-arm64"
-
-      - name: Calculate SHA256
-        run: sha256sum curator-linux-arm64 > curator-linux-arm64.sha256
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: curator-linux-arm64
-          path: curator-linux-arm64*
-
-  build-windows-x64:
-    name: Build Windows x64
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Get version
-        id: get_version
-        shell: bash
-        run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
-          else
-            echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Install dependencies
-        run: bun install
+      - name: Build with Bun config
+        run: bun run build:bun
 
       - name: Build binary
-        run: |
-          bun build --compile --target=bun-windows-x64 `
-            .\bin\cli.js `
-            --outfile "curator-windows-x64.exe"
+        run: bun build --compile --target=bun-linux-arm64 ./bin/cli.js --outfile curator-linux-arm64
 
-      - name: Calculate SHA256
-        shell: pwsh
+      - name: Create archive
         run: |
-          $hash = Get-FileHash curator-windows-x64.exe -Algorithm SHA256
-          $hash.Hash | Out-File "curator-windows-x64.exe.sha256"
+          VER="${{ steps.get_version.outputs.VERSION }}"
+          DIR="ai-curator-${VER}-linux-arm64"
+          mkdir -p "$DIR"
+          cp curator-linux-arm64 "$DIR/curator"
+          cp LICENSE "$DIR/" 2>/dev/null || true
+          cp README.md "$DIR/" 2>/dev/null || true
+          echo "# AI Curator - Quick Start" > "$DIR/QUICKSTART.md"
+          echo "" >> "$DIR/QUICKSTART.md"
+          echo "## Installation" >> "$DIR/QUICKSTART.md"
+          echo "" >> "$DIR/QUICKSTART.md"
+          echo "1. Extract this archive" >> "$DIR/QUICKSTART.md"
+          echo "2. Move curator to your PATH" >> "$DIR/QUICKSTART.md"
+          echo "3. Run: curator" >> "$DIR/QUICKSTART.md"
+          tar -czf "${DIR}.tar.gz" "$DIR"
+          sha256sum "${DIR}.tar.gz" > "${DIR}.tar.gz.sha256"
 
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: curator-windows-x64
-          path: curator-windows-x64*
+          name: linux-arm64
+          path: ai-curator-*.tar.gz*
 
   release:
     name: Create Release
-    needs: [build-macos-arm64, build-linux-x64, build-linux-arm64, build-windows-x64]
+    needs: [build-macos-arm64, build-linux-x64, build-linux-arm64]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ./binaries
-          pattern: curator-*
+          path: ./artifacts
           merge-multiple: true
 
-      - name: Display structure
+      - name: Create SHASUMS256.txt
         run: |
-          echo "=== Directory structure ==="
-          ls -laR ./binaries/
-          echo "=== Flatten if needed ==="
-          find ./binaries -type f -name "curator-*" | head -20
+          cd ./artifacts
+          cat *.sha256 > SHASUMS256.txt
+          cd ..
+
+      - name: Display files
+        run: ls -la ./artifacts/
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -197,53 +203,67 @@ jobs:
           name: Release ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}
           draft: false
           prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') || github.event.inputs.version != '' && (contains(github.event.inputs.version, 'beta') || contains(github.event.inputs.version, 'alpha')) }}
-          files: ./binaries/curator-*
+          files: |
+            ./artifacts/ai-curator-*.tar.gz
+            ./artifacts/SHASUMS256.txt
           body: |
             ## AI Curator ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.version || github.ref_name }}
 
-            **Universal binary distribution for npm, Homebrew, and direct download.**
+            **Built with bun:sqlite for native performance across all platforms.**
+
+            ### What's New
+            - Migrated from better-sqlite3 to bun:sqlite
+            - Fixed macOS ARM64 compatibility
+            - Single binary distribution (no external dependencies)
+            - Built with Bun's compile feature
 
             ### Installation
 
-            #### npm (Recommended for Node.js users)
-            ```bash
-            npm install -g @elgap/ai-curator
-            ```
-
-            #### Homebrew (macOS/Linux)
+            #### macOS (Homebrew - Recommended)
             ```bash
             brew tap elgap/tap
             brew install ai-curator
             ```
 
-            #### Try without installing
+            #### macOS/Linux (curl)
             ```bash
-            npx @elgap/ai-curator --version
+            curl -fsSL https://raw.githubusercontent.com/elgap/ai-curator/main/install.sh | bash
             ```
 
-            #### Direct Download
-            Download the appropriate binary for your platform and add to your PATH.
-
-            ### Binaries
-
-            | Platform | Binary | SHA256 |
-            |----------|--------|--------|
-            | macOS ARM64 | curator-darwin-arm64 | Check .sha256 file |
-            | Linux x64 | curator-linux-x64 | Check .sha256 file |
-            | Linux ARM64 | curator-linux-arm64 | Check .sha256 file |
+            #### npm
+            ```bash
+            npm install -g @elgap/ai-curator
+            ```
 
             ### Quick Start
 
             ```bash
             curator --version
+            curator                    # Start web UI
             curator import data.jsonl --dataset 1
             curator export --dataset 1 --format mlx --output train.jsonl
+            ```
+
+            ### Platform Support
+
+            | Platform | Architecture | Package |
+            |----------|--------------|---------|
+            | macOS | ARM64 (Apple Silicon) | ai-curator-*-darwin-arm64.tar.gz |
+            | Linux | x64 | ai-curator-*-linux-x64.tar.gz |
+            | Linux | ARM64 | ai-curator-*-linux-arm64.tar.gz |
+
+            ### Verification
+
+            Verify checksums:
+            ```bash
+            shasum -a 256 -c SHASUMS256.txt
             ```
 
             ### Links
 
             - [Documentation](https://github.com/elgap/ai-curator#readme)
             - [Issues](https://github.com/elgap/ai-curator/issues)
+            - [Homebrew Tap](https://github.com/elgap/homebrew-tap)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
